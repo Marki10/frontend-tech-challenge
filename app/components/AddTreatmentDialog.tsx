@@ -1,3 +1,6 @@
+"use client";
+
+import * as React from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -8,8 +11,29 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { toast } from "sonner";
+
+const addTreatmentSchema = z.object({
+  patient: z.string().min(1, "Patient is required"),
+  procedure: z.string().min(1, "Procedure is required"),
+  dentist: z.string().min(1, "Dentist is required"),
+  date: z.string().min(1, "Date is required"),
+  notes: z.string().optional(),
+});
+
+type AddTreatmentFormValues = z.infer<typeof addTreatmentSchema>;
 
 interface AddTreatmentDialogProps {
   children: React.ReactNode;
@@ -19,84 +43,172 @@ interface AddTreatmentDialogProps {
     dentist: string;
     date: string;
     notes: string;
-  }) => void;
+  }) => Promise<boolean>;
 }
 
 export function AddTreatmentDialog({
   children,
   onSubmit,
 }: AddTreatmentDialogProps) {
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const formData = new FormData(e.currentTarget);
-    onSubmit({
-      patient: formData.get("patient") as string,
-      procedure: formData.get("procedure") as string,
-      dentist: formData.get("dentist") as string,
-      date: formData.get("date") as string,
-      notes: formData.get("notes") as string,
-    });
-  };
+  const [open, setOpen] = React.useState(false);
+  const [serverError, setServerError] = React.useState<string | null>(null);
+
+  const form = useForm<AddTreatmentFormValues>({
+    resolver: zodResolver(addTreatmentSchema),
+    defaultValues: {
+      patient: "",
+      procedure: "",
+      dentist: "",
+      date: "",
+      notes: "",
+    },
+  });
+
+  const isSubmitting = form.formState.isSubmitting;
+
+  const handleSubmit = form.handleSubmit(async (values) => {
+    setServerError(null);
+
+    try {
+      const response = await fetch("/api/treatments", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(values),
+      });
+
+      if (response.status === 422) {
+        const data = await response.json().catch(() => null as any);
+        const message =
+          (data && typeof data.message === "string" && data.message) ||
+          "Validation error";
+        setServerError(message);
+        toast.error(message);
+        return;
+      }
+
+      if (!response.ok) {
+        setServerError("Failed to save treatment");
+        toast.error("Failed to save treatment");
+        return;
+      }
+
+      await response.json().catch(() => null as any);
+
+      await onSubmit({
+        patient: values.patient,
+        procedure: values.procedure,
+        dentist: values.dentist,
+        date: values.date,
+        notes: values.notes ?? "",
+      });
+
+      toast.success("Treatment added successfully");
+      setOpen(false);
+      form.reset();
+    } catch (error) {
+      setServerError("Failed to save treatment");
+      toast.error("Failed to save treatment");
+    }
+  });
 
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogContent>
-        <form onSubmit={handleSubmit}>
-          <DialogHeader>
-            <DialogTitle>Add treatment</DialogTitle>
-          </DialogHeader>
+        <Form {...form}>
+          <form onSubmit={handleSubmit}>
+            <DialogHeader>
+              <DialogTitle>Add treatment</DialogTitle>
+            </DialogHeader>
 
-          <div className="space-y-4 py-4">
-            <div className="grid gap-2">
-              <Label htmlFor="patient">Patient</Label>
-              <Input
-                id="patient"
+            <div className="space-y-4 py-4">
+              <FormField
+                control={form.control}
                 name="patient"
-                placeholder="Jane Doe"
-                required
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Patient</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Jane Doe" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-            </div>
 
-            <div className="grid gap-2">
-              <Label htmlFor="procedure">Procedure</Label>
-              <Input
-                id="procedure"
+              <FormField
+                control={form.control}
                 name="procedure"
-                placeholder="Filling"
-                required
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Procedure</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Filling" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-            </div>
 
-            <div className="grid gap-2">
-              <Label htmlFor="dentist">Dentist</Label>
-              <Input
-                id="dentist"
+              <FormField
+                control={form.control}
                 name="dentist"
-                placeholder="Dr. Smith"
-                required
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Dentist</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Dr. Smith" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-            </div>
 
-            <div className="grid gap-2">
-              <Label htmlFor="date">Date</Label>
-              <Input id="date" name="date" type="date" required />
-            </div>
+              <FormField
+                control={form.control}
+                name="date"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Date</FormLabel>
+                    <FormControl>
+                      <Input type="date" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-            <div className="grid gap-2">
-              <Label htmlFor="notes">Notes</Label>
-              <Textarea
-                id="notes"
+              <FormField
+                control={form.control}
                 name="notes"
-                placeholder="Add any treatment notes"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Notes</FormLabel>
+                    <FormControl>
+                      <Textarea
+                        placeholder="Add any treatment notes"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-            </div>
-          </div>
 
-          <DialogFooter>
-            <Button type="submit">Save treatment</Button>
-          </DialogFooter>
-        </form>
+              {serverError && (
+                <p className="text-sm text-destructive">{serverError}</p>
+              )}
+            </div>
+
+            <DialogFooter>
+              <Button type="submit" disabled={isSubmitting}>
+                {isSubmitting ? "Saving..." : "Save treatment"}
+              </Button>
+            </DialogFooter>
+          </form>
+        </Form>
       </DialogContent>
     </Dialog>
   );
