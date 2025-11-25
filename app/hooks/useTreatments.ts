@@ -3,7 +3,7 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import type { Treatment, TreatmentStatus, TreatmentsState } from "@/lib/types";
 import { CreateTreatmentRequest } from "@/lib/api.types";
 import { toast } from "sonner";
-import { z } from "zod";
+import { fetchTreatmentsApi } from "@/lib/treatmentsApi";
 
 const ITEMS_PER_PAGE = 10;
 
@@ -36,31 +36,6 @@ const initialState: Omit<TreatmentsState, "pagination"> & {
   },
 };
 
-const treatmentsResponseSchema = z.object({
-  data: z
-    .array(
-      z.object({
-        id: z.number(),
-        patient: z.string(),
-        procedure: z.string(),
-        dentist: z.string(),
-        date: z.string(),
-        status: z
-          .enum(["scheduled", "in_progress", "completed", "cancelled"])
-          .optional(),
-        notes: z.string().optional(),
-        cost: z.number().optional(),
-        createdAt: z.string().optional(),
-        updatedAt: z.string().optional(),
-      })
-    )
-    .optional(),
-  total: z.number().optional(),
-  page: z.number().optional(),
-  pageSize: z.number().optional(),
-  totalPages: z.number().optional(),
-});
-
 export function useTreatments() {
   const [state, setState] = useState(initialState);
 
@@ -85,15 +60,13 @@ export function useTreatments() {
   const { filters, sort, pagination } = state;
 
   useEffect(() => {
+    const urlSearch = (searchParams.get("search") || "").trim();
+    const urlStatus = (searchParams.get("status") || "all") as
+      | TreatmentStatus
+      | "all";
+    const urlPage = Number.parseInt(searchParams.get("page") || "1", 10);
+
     setState((prev) => {
-      if (!searchParams) return prev;
-
-      const urlSearch = (searchParams.get("search") || "").trim();
-      const urlStatus = (searchParams.get("status") || "all") as
-        | TreatmentStatus
-        | "all";
-      const urlPage = Number.parseInt(searchParams.get("page") || "1", 10);
-
       return {
         ...prev,
         filters: {
@@ -156,26 +129,14 @@ export function useTreatments() {
         const controller = new AbortController();
         abortControllerRef.current = controller;
 
-        const response = await fetch(`/api/treatments?${queryString}`, {
-          signal: controller.signal,
-        });
+        const result = await fetchTreatmentsApi(
+          queryString,
+          pagination.page,
+          pagination.pageSize,
+          controller.signal
+        );
 
-        if (!response.ok) {
-          throw new Error("Failed to load treatments");
-        }
-
-        const text = await response.text();
-        const json = text ? JSON.parse(text) : {};
-        const parsed = treatmentsResponseSchema.safeParse(json);
-
-        if (!parsed.success) {
-          throw new Error("Invalid treatments response");
-        }
-
-        const data = parsed.data;
-        const rawItems = Array.isArray(data.data) ? data.data : [];
-
-        const items = [...rawItems].sort((a: Treatment, b: Treatment) => {
+        const items = [...result.items].sort((a: Treatment, b: Treatment) => {
           const aValue = a[sort.field]?.toString().toLowerCase() || "";
           const bValue = b[sort.field]?.toString().toLowerCase() || "";
 
@@ -185,10 +146,10 @@ export function useTreatments() {
         });
 
         const nextPagination = {
-          page: data.page ?? pagination.page,
-          pageSize: data.pageSize ?? pagination.pageSize,
-          total: data.total ?? items.length,
-          totalPages: data.totalPages ?? state.pagination.totalPages,
+          page: result.page,
+          pageSize: result.pageSize,
+          total: result.total,
+          totalPages: result.totalPages ?? state.pagination.totalPages,
         };
 
         cacheRef.current.set(queryString, {
