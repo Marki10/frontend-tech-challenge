@@ -35,8 +35,13 @@ export function ThemeToggle() {
       size="icon"
       onClick={toggleTheme}
       aria-label={isDark ? "Use light theme" : "Use dark theme"}
+      data-testid="theme-toggle"
     >
-      {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+      {isDark ? (
+        <Sun className="h-4 w-4" data-testid="sun-icon" />
+      ) : (
+        <Moon className="h-4 w-4" data-testid="moon-icon" />
+      )}
     </Button>
   );
 }
