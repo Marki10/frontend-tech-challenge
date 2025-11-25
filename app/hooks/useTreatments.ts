@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import type { Treatment, TreatmentStatus, TreatmentsState } from "@/lib/types";
 import { CreateTreatmentRequest } from "@/lib/api.types";
 
@@ -36,23 +37,92 @@ const initialState: Omit<TreatmentsState, "pagination"> & {
 export function useTreatments() {
   const [state, setState] = useState(initialState);
 
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  const { filters, sort, pagination } = state;
+
   useEffect(() => {
-    const loadTreatments = async () => {
+    setState((prev) => {
+      if (!searchParams) return prev;
+
+      const urlSearch = (searchParams.get("search") || "").trim();
+      const urlStatus = (searchParams.get("status") || "all") as
+        | TreatmentStatus
+        | "all";
+      const urlPage = Number.parseInt(searchParams.get("page") || "1", 10);
+
+      return {
+        ...prev,
+        filters: {
+          ...prev.filters,
+          search: urlSearch || prev.filters.search,
+          status: (urlStatus || prev.filters.status) as TreatmentStatus | "all",
+        },
+        pagination: {
+          ...prev.pagination,
+          page: Number.isNaN(urlPage) || urlPage <= 0 ? 1 : urlPage,
+        },
+      };
+    });
+  }, []);
+
+  useEffect(() => {
+    const fetchTreatments = async () => {
       setState((prev) => ({ ...prev, isLoading: true }));
+
       try {
-        const response = await fetch("/api/treatments");
-        const data = await response.json();
-        const items = Array.isArray(data?.data) ? data.data : [];
+        const params = new URLSearchParams();
+
+        if (filters.search?.trim()) {
+          params.set("search", filters.search.trim());
+        }
+
+        if (filters.status && filters.status !== "all") {
+          params.set("status", filters.status);
+        }
+
+        params.set("page", String(pagination.page));
+        params.set("pageSize", String(pagination.pageSize));
+
+        const queryString = params.toString();
+
+        router.replace(queryString ? `${pathname}?${queryString}` : pathname, {
+          scroll: false,
+        });
+
+        const response = await fetch(`/api/treatments?${queryString}`);
+
+        if (!response.ok) {
+          throw new Error("Failed to load treatments");
+        }
+
+        const text = await response.text();
+        const data = text ? JSON.parse(text) : {};
+        const rawItems = Array.isArray(data?.data) ? data.data : [];
+
+        const items = [...rawItems].sort((a: Treatment, b: Treatment) => {
+          const aValue = a[sort.field]?.toString().toLowerCase() || "";
+          const bValue = b[sort.field]?.toString().toLowerCase() || "";
+
+          if (aValue < bValue) return sort.direction === "asc" ? -1 : 1;
+          if (aValue > bValue) return sort.direction === "asc" ? 1 : -1;
+          return 0;
+        });
 
         setState((prev) => ({
           ...prev,
           items,
           filteredItems: items,
+          paginatedItems: items,
           isLoading: false,
           pagination: {
             ...prev.pagination,
-            total: items.length,
-            totalPages: Math.ceil(items.length / prev.pagination.pageSize),
+            page: data?.page ?? pagination.page,
+            pageSize: data?.pageSize ?? pagination.pageSize,
+            total: data?.total ?? items.length,
+            totalPages: data?.totalPages ?? prev.pagination.totalPages,
           },
         }));
       } catch (err) {
@@ -62,64 +132,8 @@ export function useTreatments() {
       }
     };
 
-    loadTreatments();
-  }, []);
-
-  useEffect(() => {
-    setState((prev) => {
-      let filteredItems = [...prev.items];
-
-      if (prev.filters.search?.trim()) {
-        const query = prev.filters.search.toLowerCase();
-        filteredItems = filteredItems.filter(
-          (item) =>
-            item.patient.toLowerCase().includes(query) ||
-            item.procedure.toLowerCase().includes(query) ||
-            item.dentist.toLowerCase().includes(query)
-        );
-      }
-
-      if (prev.filters.status && prev.filters.status !== "all") {
-        filteredItems = filteredItems.filter(
-          (item) => (item.status || "unknown") === prev.filters.status
-        );
-      }
-
-      filteredItems.sort((a, b) => {
-        const aValue = a[prev.sort.field]?.toString().toLowerCase() || "";
-        const bValue = b[prev.sort.field]?.toString().toLowerCase() || "";
-
-        if (aValue < bValue) return prev.sort.direction === "asc" ? -1 : 1;
-        if (aValue > bValue) return prev.sort.direction === "asc" ? 1 : -1;
-        return 0;
-      });
-
-      const startIndex = (prev.pagination.page - 1) * prev.pagination.pageSize;
-      const paginatedItems = filteredItems.slice(
-        startIndex,
-        startIndex + prev.pagination.pageSize
-      );
-
-      return {
-        ...prev,
-        filteredItems,
-        paginatedItems,
-        pagination: {
-          ...prev.pagination,
-          total: filteredItems.length,
-          totalPages: Math.ceil(
-            filteredItems.length / prev.pagination.pageSize
-          ),
-        },
-      };
-    });
-  }, [
-    state.items,
-    state.filters,
-    state.sort,
-    state.pagination.page,
-    state.pagination.pageSize,
-  ]);
+    fetchTreatments();
+  }, [filters, sort, pagination.page, pagination.pageSize, pathname, router]);
 
   const handleAddTreatment = useCallback(
     async (data: CreateTreatmentRequest) => {
