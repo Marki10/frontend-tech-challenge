@@ -1,7 +1,7 @@
 import { Input } from "@/components/ui/input";
 
 interface SearchBarProps {
-  value: string;
+  value: string | undefined;
   onChange: (value: string) => void;
   placeholder?: string;
 }

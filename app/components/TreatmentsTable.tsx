@@ -1,12 +1,5 @@
-import type { Treatment } from "@/lib/types";
 import { TreatmentRow } from "./TreatmentRow";
-
-interface TreatmentsTableProps {
-  treatments: Treatment[];
-  isLoading: boolean;
-  total: number;
-  filteredCount: number;
-}
+import type { TreatmentsTableProps } from "@/lib/component.types";
 
 export function TreatmentsTable({
   treatments,

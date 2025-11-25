@@ -5,9 +5,9 @@ import { AddTreatmentDialog } from "./AddTreatmentDialog";
 import type { TreatmentStatus } from "@/lib/types";
 
 interface FiltersSectionProps {
-  search: string;
+  search: string | undefined;
   onSearchChange: (value: string) => void;
-  status: TreatmentStatus | "all";
+  status: TreatmentStatus | "all" | undefined;
   onStatusChange: (value: TreatmentStatus | "all") => void;
   onAddTreatment: (data: {
     patient: string;

@@ -8,25 +8,25 @@ import { useTreatments } from "./hooks/useTreatments";
 
 export default function TreatmentsPage() {
   const {
-    search,
-    status,
+    items,
+    filteredItems,
+    paginatedItems,
     isLoading,
     error,
-    filteredTreatments,
-    paginatedTreatments,
-    currentPage,
-    totalPages,
-    totalCount,
+    filters,
+    sort,
+    pagination,
+    handleAddTreatment,
     setSearch,
     setStatus,
     setCurrentPage,
-    handleAddTreatment,
+    handleSort,
   } = useTreatments();
 
   if (error) {
     return (
       <div className="container mx-auto flex flex-col gap-6 py-10">
-        <ErrorState />
+        <ErrorState error={error} onRetry={() => window.location.reload()} />
       </div>
     );
   }
@@ -36,21 +36,23 @@ export default function TreatmentsPage() {
       <Header />
 
       <FiltersSection
-        search={search}
+        search={filters.search}
         onSearchChange={setSearch}
-        status={status}
+        status={filters.status}
         onStatusChange={setStatus}
         onAddTreatment={handleAddTreatment}
       />
 
       <TreatmentsContent
-        filteredTreatments={filteredTreatments}
-        paginatedTreatments={paginatedTreatments}
+        filteredTreatments={filteredItems}
+        paginatedTreatments={paginatedItems}
         isLoading={isLoading}
-        total={totalCount}
-        currentPage={currentPage}
-        totalPages={totalPages}
+        total={items.length}
+        currentPage={pagination.page}
+        totalPages={pagination.totalPages}
         onPageChange={setCurrentPage}
+        sortConfig={sort}
+        onSort={handleSort}
       />
     </div>
   );

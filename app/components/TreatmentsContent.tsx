@@ -1,7 +1,7 @@
 import { TreatmentsTable } from "./TreatmentsTable";
 import { EmptyState } from "./EmptyState";
 import { PaginationControls } from "./PaginationControls";
-import type { Treatment } from "@/lib/types";
+import type { Treatment, SortConfig } from "@/lib/types";
 
 interface TreatmentsContentProps {
   filteredTreatments: Treatment[];
@@ -11,6 +11,8 @@ interface TreatmentsContentProps {
   currentPage: number;
   totalPages: number;
   onPageChange: (page: number) => void;
+  sortConfig?: SortConfig;
+  onSort?: (field: string) => void;
 }
 
 export function TreatmentsContent({
@@ -21,6 +23,8 @@ export function TreatmentsContent({
   currentPage,
   totalPages,
   onPageChange,
+  sortConfig,
+  onSort,
 }: TreatmentsContentProps) {
   if (filteredTreatments.length === 0) {
     return <EmptyState />;
@@ -33,6 +37,8 @@ export function TreatmentsContent({
         isLoading={isLoading}
         total={total}
         filteredCount={filteredTreatments.length}
+        sortConfig={sortConfig}
+        onSort={onSort}
       />
       <PaginationControls
         currentPage={currentPage}

@@ -16,7 +16,7 @@ const STATUS_OPTIONS = [
 ] as const;
 
 interface StatusFilterProps {
-  value: TreatmentStatus | "all";
+  value: TreatmentStatus | "all" | undefined;
   onChange: (value: TreatmentStatus | "all") => void;
 }
 

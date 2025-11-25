@@ -1,106 +1,198 @@
-import { useState, useEffect, useCallback } from "react";
-import type { Treatment, TreatmentStatus } from "@/lib/types";
+import { useState, useEffect, useCallback, useMemo } from "react";
+import type { Treatment, TreatmentStatus, TreatmentsState } from "@/lib/types";
+import { CreateTreatmentRequest } from "@/lib/api.types";
 
 const ITEMS_PER_PAGE = 10;
 
+const initialState: Omit<TreatmentsState, "pagination"> & {
+  pagination: {
+    page: number;
+    pageSize: number;
+    total: number;
+    totalPages: number;
+  };
+} = {
+  items: [],
+  filteredItems: [],
+  paginatedItems: [],
+  isLoading: false,
+  error: null,
+  filters: {
+    search: "",
+    status: "all",
+  },
+  sort: {
+    field: "date",
+    direction: "desc",
+  },
+  pagination: {
+    page: 1,
+    pageSize: ITEMS_PER_PAGE,
+    total: 0,
+    totalPages: 0,
+  },
+};
+
 export function useTreatments() {
-  const [treatments, setTreatments] = useState<Treatment[]>([]);
-  const [filtered, setFiltered] = useState<Treatment[]>([]);
-  const [search, setSearch] = useState("");
-  const [status, setStatus] = useState<TreatmentStatus | "all">("all");
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<Error | null>(null);
-  const [currentPage, setCurrentPage] = useState(1);
+  const [state, setState] = useState(initialState);
 
   useEffect(() => {
-    async function load() {
-      setIsLoading(true);
+    const loadTreatments = async () => {
+      setState((prev) => ({ ...prev, isLoading: true }));
       try {
         const response = await fetch("/api/treatments");
         const data = await response.json();
-        const items = data.data ?? [];
-        setTreatments(items);
-        setFiltered(items);
-      } catch (err) {
-        setError(
-          err instanceof Error ? err : new Error("Failed to load treatments")
-        );
-      } finally {
-        setIsLoading(false);
-      }
-    }
+        const items = Array.isArray(data?.data) ? data.data : [];
 
-    load();
+        setState((prev) => ({
+          ...prev,
+          items,
+          filteredItems: items,
+          isLoading: false,
+          pagination: {
+            ...prev.pagination,
+            total: items.length,
+            totalPages: Math.ceil(items.length / prev.pagination.pageSize),
+          },
+        }));
+      } catch (err) {
+        const error =
+          err instanceof Error ? err : new Error("Failed to load treatments");
+        setState((prev) => ({ ...prev, error, isLoading: false }));
+      }
+    };
+
+    loadTreatments();
   }, []);
 
   useEffect(() => {
-    let next = [...treatments];
+    setState((prev) => {
+      let filteredItems = [...prev.items];
 
-    if (search.trim()) {
-      const query = search.toLowerCase();
-      next = next.filter((item) => {
-        return (
-          item.patient.toLowerCase().includes(query) ||
-          item.procedure.toLowerCase().includes(query) ||
-          item.dentist.toLowerCase().includes(query)
+      if (prev.filters.search?.trim()) {
+        const query = prev.filters.search.toLowerCase();
+        filteredItems = filteredItems.filter(
+          (item) =>
+            item.patient.toLowerCase().includes(query) ||
+            item.procedure.toLowerCase().includes(query) ||
+            item.dentist.toLowerCase().includes(query)
         );
+      }
+
+      if (prev.filters.status && prev.filters.status !== "all") {
+        filteredItems = filteredItems.filter(
+          (item) => (item.status || "unknown") === prev.filters.status
+        );
+      }
+
+      filteredItems.sort((a, b) => {
+        const aValue = a[prev.sort.field]?.toString().toLowerCase() || "";
+        const bValue = b[prev.sort.field]?.toString().toLowerCase() || "";
+
+        if (aValue < bValue) return prev.sort.direction === "asc" ? -1 : 1;
+        if (aValue > bValue) return prev.sort.direction === "asc" ? 1 : -1;
+        return 0;
       });
-    }
 
-    if (status !== "all") {
-      next = next.filter((item) => (item.status || "unknown") === status);
-    }
+      const startIndex = (prev.pagination.page - 1) * prev.pagination.pageSize;
+      const paginatedItems = filteredItems.slice(
+        startIndex,
+        startIndex + prev.pagination.pageSize
+      );
 
-    setFiltered(next);
-    setCurrentPage(1);
-  }, [search, status, treatments]);
+      return {
+        ...prev,
+        filteredItems,
+        paginatedItems,
+        pagination: {
+          ...prev.pagination,
+          total: filteredItems.length,
+          totalPages: Math.ceil(
+            filteredItems.length / prev.pagination.pageSize
+          ),
+        },
+      };
+    });
+  }, [
+    state.items,
+    state.filters,
+    state.sort,
+    state.pagination.page,
+    state.pagination.pageSize,
+  ]);
 
   const handleAddTreatment = useCallback(
-    async (data: {
-      patient: string;
-      procedure: string;
-      dentist: string;
-      date: string;
-      notes: string;
-    }) => {
+    async (data: CreateTreatmentRequest) => {
       try {
         const newTreatment: Treatment = {
           ...data,
           id: Date.now(),
-          status: "scheduled" as const,
+          status: data.status || "scheduled",
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
         };
 
-        setTreatments((prev) => [newTreatment, ...prev]);
+        setState((prev) => ({
+          ...prev,
+          items: [newTreatment, ...prev.items],
+        }));
+
         return true;
       } catch (err) {
-        setError(
-          err instanceof Error ? err : new Error("Failed to add treatment")
-        );
+        const error =
+          err instanceof Error ? err : new Error("Failed to add treatment");
+        setState((prev) => ({ ...prev, error }));
         return false;
       }
     },
     []
   );
 
-  const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE);
-  const paginatedTreatments = filtered.slice(
-    (currentPage - 1) * ITEMS_PER_PAGE,
-    currentPage * ITEMS_PER_PAGE
-  );
+  const setSearch = useCallback((search: string) => {
+    setState((prev) => ({
+      ...prev,
+      filters: { ...prev.filters, search },
+      pagination: { ...prev.pagination, page: 1 },
+    }));
+  }, []);
+
+  const setStatus = useCallback((status: TreatmentStatus | "all") => {
+    setState((prev) => ({
+      ...prev,
+      filters: { ...prev.filters, status },
+      pagination: { ...prev.pagination, page: 1 },
+    }));
+  }, []);
+
+  const setCurrentPage = useCallback((page: number) => {
+    setState((prev) => ({
+      ...prev,
+      pagination: { ...prev.pagination, page },
+    }));
+  }, []);
+
+  const handleSort = useCallback((field: string) => {
+    setState((prev) => ({
+      ...prev,
+      sort: {
+        field: field as keyof Omit<
+          Treatment,
+          "id" | "notes" | "createdAt" | "updatedAt"
+        >,
+        direction:
+          prev.sort.field === field && prev.sort.direction === "asc"
+            ? "desc"
+            : "asc",
+      },
+    }));
+  }, []);
 
   return {
-    search,
-    status,
-    isLoading,
-    error,
-    filteredTreatments: filtered,
-    paginatedTreatments,
-    currentPage,
-    totalPages,
-    totalCount: treatments.length,
+    ...state,
+    handleAddTreatment,
     setSearch,
     setStatus,
     setCurrentPage,
-    handleAddTreatment,
+    handleSort,
   };
 }
