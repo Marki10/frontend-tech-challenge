@@ -25,6 +25,7 @@ interface TreatmentsContextType {
   handleAddTreatment: (
     data: Omit<Treatment, "id" | "createdAt" | "updatedAt">
   ) => Promise<boolean>;
+  updateTreatmentStatus: (id: number, status: TreatmentStatus) => Promise<void>;
   setSearch: (search: string) => void;
   setStatus: (status: TreatmentStatus | "all") => void;
   setCurrentPage: (page: number) => void;

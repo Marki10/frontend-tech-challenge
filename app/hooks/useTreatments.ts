@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import type { Treatment, TreatmentStatus, TreatmentsState } from "@/lib/types";
 import { CreateTreatmentRequest } from "@/lib/api.types";
+import { toast } from "sonner";
 
 const ITEMS_PER_PAGE = 10;
 
@@ -162,6 +163,61 @@ export function useTreatments() {
     []
   );
 
+  const updateTreatmentStatus = useCallback(
+    async (id: number, status: TreatmentStatus) => {
+      let previousItems: Treatment[] = [];
+
+      setState((prev) => {
+        previousItems = prev.items;
+
+        const updatedItems = prev.items.map((item) =>
+          item.id === id ? { ...item, status } : item
+        );
+
+        return {
+          ...prev,
+          items: updatedItems,
+          filteredItems: updatedItems,
+          paginatedItems: updatedItems,
+        };
+      });
+
+      try {
+        const response = await fetch(`/api/treatments/${id}`, {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ status }),
+        });
+
+        if (!response.ok) {
+          setState((prev) => ({
+            ...prev,
+            items: previousItems,
+            filteredItems: previousItems,
+            paginatedItems: previousItems,
+          }));
+
+          toast.error("Failed to update status");
+          return;
+        }
+
+        toast.success("Status updated");
+      } catch (err) {
+        setState((prev) => ({
+          ...prev,
+          items: previousItems,
+          filteredItems: previousItems,
+          paginatedItems: previousItems,
+        }));
+
+        toast.error("Failed to update status");
+      }
+    },
+    []
+  );
+
   const setSearch = useCallback((search: string) => {
     setState((prev) => ({
       ...prev,
@@ -207,6 +263,7 @@ export function useTreatments() {
   return {
     ...state,
     handleAddTreatment,
+    updateTreatmentStatus,
     setSearch,
     setStatus,
     setCurrentPage,

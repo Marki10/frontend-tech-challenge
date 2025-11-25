@@ -6,6 +6,7 @@ export function TreatmentsTable({
   isLoading,
   total,
   filteredCount,
+  onUpdateStatus,
 }: TreatmentsTableProps) {
   if (isLoading) {
     return (
@@ -23,7 +24,11 @@ export function TreatmentsTable({
 
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
         {treatments.map((treatment, index) => (
-          <TreatmentRow key={treatment.id || index} treatment={treatment} />
+          <TreatmentRow
+            key={treatment.id || index}
+            treatment={treatment}
+            onUpdateStatus={onUpdateStatus}
+          />
         ))}
       </div>
     </>

@@ -16,13 +16,42 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import type { Treatment } from "@/lib/types";
+import type { Treatment, TreatmentStatus } from "@/lib/types";
+
+const STATUS_CONFIG: Record<
+  TreatmentStatus,
+  { label: string; className: string }
+> = {
+  scheduled: {
+    label: "Scheduled",
+    className:
+      "bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-200",
+  },
+  in_progress: {
+    label: "In progress",
+    className:
+      "bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-200",
+  },
+  completed: {
+    label: "Completed",
+    className:
+      "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-200",
+  },
+  cancelled: {
+    label: "Cancelled",
+    className:
+      "bg-rose-100 text-rose-700 dark:bg-rose-900/40 dark:text-rose-200",
+  },
+};
 
 interface TreatmentRowProps {
   treatment: Treatment;
+  onUpdateStatus?: (id: number, status: TreatmentStatus) => void;
 }
 
-export function TreatmentRow({ treatment }: TreatmentRowProps) {
+export function TreatmentRow({ treatment, onUpdateStatus }: TreatmentRowProps) {
+  const status = (treatment.status || "scheduled") as TreatmentStatus;
+  const statusConfig = STATUS_CONFIG[status];
   return (
     <Card className="shadow-sm">
       <CardHeader>
@@ -40,8 +69,8 @@ export function TreatmentRow({ treatment }: TreatmentRowProps) {
         </div>
         <div>
           <div className="text-xs text-muted-foreground">Status</div>
-          <Badge className="mt-1 bg-slate-100 text-slate-700 dark:bg-slate-900 dark:text-slate-200">
-            {treatment.status}
+          <Badge className={`mt-1 ${statusConfig.className}`}>
+            {statusConfig.label}
           </Badge>
         </div>
         {treatment.notes ? (
@@ -62,16 +91,25 @@ export function TreatmentRow({ treatment }: TreatmentRowProps) {
             <DropdownMenuSeparator />
             <DropdownMenuCheckboxItem
               checked={treatment.status === "scheduled"}
+              onCheckedChange={() =>
+                onUpdateStatus?.(treatment.id, "scheduled")
+              }
             >
               Scheduled
             </DropdownMenuCheckboxItem>
             <DropdownMenuCheckboxItem
               checked={treatment.status === "in_progress"}
+              onCheckedChange={() =>
+                onUpdateStatus?.(treatment.id, "in_progress")
+              }
             >
               In Progress
             </DropdownMenuCheckboxItem>
             <DropdownMenuCheckboxItem
               checked={treatment.status === "completed"}
+              onCheckedChange={() =>
+                onUpdateStatus?.(treatment.id, "completed")
+              }
             >
               Completed
             </DropdownMenuCheckboxItem>

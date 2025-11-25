@@ -22,6 +22,7 @@ function TreatmentsPageContent() {
     sort,
     pagination,
     handleAddTreatment,
+    updateTreatmentStatus,
     setSearch,
     setStatus,
     setCurrentPage,
@@ -58,6 +59,7 @@ function TreatmentsPageContent() {
         onPageChange={setCurrentPage}
         sortConfig={sort}
         onSort={handleSort}
+        onUpdateStatus={updateTreatmentStatus}
       />
     </div>
   );

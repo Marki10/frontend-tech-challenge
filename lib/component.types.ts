@@ -9,12 +9,12 @@ export interface TreatmentsTableProps {
   sortConfig?: SortConfig;
   onSort?: (field: string) => void;
   className?: string;
+  onUpdateStatus?: (id: number, status: TreatmentStatus) => void;
 }
 
 export interface TreatmentRowProps {
   treatment: Treatment;
-  onEdit?: (treatment: Treatment) => void;
-  onDelete?: (id: number) => void;
+  onUpdateStatus?: (id: number, status: TreatmentStatus) => void;
   className?: string;
 }
 
