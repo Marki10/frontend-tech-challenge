@@ -1,6 +1,7 @@
 import { TreatmentsTable } from "./TreatmentsTable";
 import { EmptyState } from "./EmptyState";
 import { PaginationControls } from "./PaginationControls";
+import { Button } from "@/components/ui/button";
 import type { Treatment, TreatmentStatus, SortConfig } from "@/lib/types";
 
 interface TreatmentsContentProps {
@@ -29,7 +30,13 @@ export function TreatmentsContent({
   onUpdateStatus,
 }: TreatmentsContentProps) {
   if (filteredTreatments.length === 0) {
-    return <EmptyState />;
+    return (
+      <EmptyState>
+        <Button variant="outline" onClick={() => window.location.reload()}>
+          Clear filters
+        </Button>
+      </EmptyState>
+    );
   }
 
   return (
@@ -47,6 +54,7 @@ export function TreatmentsContent({
         currentPage={currentPage}
         totalPages={totalPages}
         onPageChange={onPageChange}
+        disabled={isLoading}
         className="mt-4"
       />
     </>

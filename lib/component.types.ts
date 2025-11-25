@@ -41,6 +41,7 @@ export interface PaginationControlsProps {
   totalPages: number;
   onPageChange: (page: number) => void;
   className?: string;
+  disabled?: boolean;
 }
 
 export interface EmptyStateProps {

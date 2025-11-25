@@ -11,6 +11,7 @@ interface PaginationControlsProps {
   totalPages: number;
   onPageChange: (page: number) => void;
   className?: string;
+  disabled?: boolean;
 }
 
 export function PaginationControls({
@@ -18,6 +19,7 @@ export function PaginationControls({
   totalPages,
   onPageChange,
   className = "",
+  disabled = false,
 }: PaginationControlsProps) {
   if (totalPages <= 1) return null;
 
@@ -31,7 +33,7 @@ export function PaginationControls({
           variant="outline"
           size="icon"
           onClick={() => onPageChange(1)}
-          disabled={currentPage === 1}
+          disabled={disabled || currentPage === 1}
         >
           <ChevronsLeft className="h-4 w-4" />
           <span className="sr-only">First page</span>
@@ -40,7 +42,7 @@ export function PaginationControls({
           variant="outline"
           size="icon"
           onClick={() => onPageChange(currentPage - 1)}
-          disabled={currentPage === 1}
+          disabled={disabled || currentPage === 1}
         >
           <ChevronLeft className="h-4 w-4" />
           <span className="sr-only">Previous page</span>
@@ -49,7 +51,7 @@ export function PaginationControls({
           variant="outline"
           size="icon"
           onClick={() => onPageChange(currentPage + 1)}
-          disabled={currentPage === totalPages}
+          disabled={disabled || currentPage === totalPages}
         >
           <ChevronRight className="h-4 w-4" />
           <span className="sr-only">Next page</span>
@@ -58,7 +60,7 @@ export function PaginationControls({
           variant="outline"
           size="icon"
           onClick={() => onPageChange(totalPages)}
-          disabled={currentPage === totalPages}
+          disabled={disabled || currentPage === totalPages}
         >
           <ChevronsRight className="h-4 w-4" />
           <span className="sr-only">Last page</span>
