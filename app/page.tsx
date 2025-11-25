@@ -13,7 +13,6 @@ import {
 // Create a separate component for the page content that uses the context
 function TreatmentsPageContent() {
   const {
-    items,
     filteredItems,
     paginatedItems,
     isLoading,

@@ -1,4 +1,4 @@
-import { Treatment, TreatmentStatus, SortConfig, FilterParams } from "./types";
+import { Treatment, TreatmentStatus, SortConfig } from "./types";
 import { ReactNode } from "react";
 
 export interface TreatmentsTableProps {

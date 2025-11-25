@@ -79,7 +79,7 @@ export function AddTreatmentDialog({
       });
 
       if (response.status === 422) {
-        const data = await response.json().catch(() => null as any);
+        const data = await response.json().catch(() => null as unknown);
         const message =
           (data && typeof data.message === "string" && data.message) ||
           "Validation error";
@@ -94,7 +94,7 @@ export function AddTreatmentDialog({
         return;
       }
 
-      await response.json().catch(() => null as any);
+      await response.json().catch(() => null as unknown);
 
       await onSubmit({
         patient: values.patient,
@@ -107,7 +107,7 @@ export function AddTreatmentDialog({
       toast.success("Treatment added successfully");
       setOpen(false);
       form.reset();
-    } catch (error) {
+    } catch {
       setServerError("Failed to save treatment");
       toast.error("Failed to save treatment");
     }
