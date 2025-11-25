@@ -1,12 +1,17 @@
+// app/page.tsx
 "use client";
 
 import { Header } from "./components/Header";
 import { FiltersSection } from "./components/FiltersSection";
 import { TreatmentsContent } from "./components/TreatmentsContent";
 import { ErrorState } from "./components/ErrorState";
-import { useTreatments } from "./hooks/useTreatments";
+import {
+  TreatmentsProvider,
+  useTreatmentsContext,
+} from "./context/TreatmentsContext";
 
-export default function TreatmentsPage() {
+// Create a separate component for the page content that uses the context
+function TreatmentsPageContent() {
   const {
     items,
     filteredItems,
@@ -21,7 +26,7 @@ export default function TreatmentsPage() {
     setStatus,
     setCurrentPage,
     handleSort,
-  } = useTreatments();
+  } = useTreatmentsContext();
 
   if (error) {
     return (
@@ -47,7 +52,7 @@ export default function TreatmentsPage() {
         filteredTreatments={filteredItems}
         paginatedTreatments={paginatedItems}
         isLoading={isLoading}
-        total={items.length}
+        total={pagination.total}
         currentPage={pagination.page}
         totalPages={pagination.totalPages}
         onPageChange={setCurrentPage}
@@ -55,5 +60,14 @@ export default function TreatmentsPage() {
         onSort={handleSort}
       />
     </div>
+  );
+}
+
+// The main page component that wraps everything with the provider
+export default function TreatmentsPage() {
+  return (
+    <TreatmentsProvider>
+      <TreatmentsPageContent />
+    </TreatmentsProvider>
   );
 }

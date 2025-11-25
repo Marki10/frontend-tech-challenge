@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo } from "react";
+import { useState, useEffect, useCallback } from "react";
 import type { Treatment, TreatmentStatus, TreatmentsState } from "@/lib/types";
 import { CreateTreatmentRequest } from "@/lib/api.types";
 
@@ -151,7 +151,10 @@ export function useTreatments() {
   const setSearch = useCallback((search: string) => {
     setState((prev) => ({
       ...prev,
-      filters: { ...prev.filters, search },
+      filters: {
+        ...prev.filters,
+        search: search || "",
+      },
       pagination: { ...prev.pagination, page: 1 },
     }));
   }, []);
