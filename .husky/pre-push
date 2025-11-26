@@ -1,1 +1,7 @@
-npm run test
+#!/usr/bin/env node
+const { execSync } = require('child_process');
+try {
+  execSync('npm run test', { stdio: 'inherit' });
+} catch (error) {
+  process.exit(1);
+}
