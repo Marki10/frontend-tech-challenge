@@ -3,6 +3,7 @@ import { SearchBar } from "./SearchBar";
 import { StatusFilter } from "./StatusFilter";
 import { AddTreatmentDialog } from "./AddTreatmentDialog";
 import type { TreatmentStatus } from "@/lib/types";
+import { useTranslations } from "next-intl";
 
 interface FiltersSectionProps {
   search: string | undefined;
@@ -25,6 +26,8 @@ export function FiltersSection({
   onStatusChange,
   onAddTreatment,
 }: FiltersSectionProps) {
+  const t = useTranslations();
+
   return (
     <section className="flex flex-col gap-4 rounded-lg border bg-card/40 p-4">
       <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
@@ -32,13 +35,13 @@ export function FiltersSection({
           <SearchBar
             value={search}
             onChange={onSearchChange}
-            placeholder="Search patients, procedures, dentists..."
+            placeholder={t("search-patients-procedures-dentists")}
           />
           <StatusFilter value={status} onChange={onStatusChange} />
         </div>
 
         <AddTreatmentDialog onSubmit={onAddTreatment}>
-          <Button>Add treatment</Button>
+          <Button>{t("treatments-add")}</Button>
         </AddTreatmentDialog>
       </div>
     </section>

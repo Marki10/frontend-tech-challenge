@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import type { Treatment, TreatmentStatus } from "@/lib/types";
 import { TREATMENT_STATUS_CONFIG } from "@/lib/treatmentStatusConfig";
+import { useTranslations } from "next-intl";
 
 interface TreatmentRowProps {
   treatment: Treatment;
@@ -25,6 +26,7 @@ interface TreatmentRowProps {
 }
 
 export function TreatmentRow({ treatment, onUpdateStatus }: TreatmentRowProps) {
+  const t = useTranslations();
   const status = (treatment.status || "scheduled") as TreatmentStatus;
   const statusConfig = TREATMENT_STATUS_CONFIG[status];
 
@@ -36,15 +38,19 @@ export function TreatmentRow({ treatment, onUpdateStatus }: TreatmentRowProps) {
       </CardHeader>
       <CardContent className="space-y-3">
         <div>
-          <div className="text-xs text-muted-foreground">Dentist</div>
+          <div className="text-xs text-muted-foreground">
+            {t("form-dentist")}
+          </div>
           <div className="text-sm font-medium">{treatment.dentist}</div>
         </div>
         <div>
-          <div className="text-xs text-muted-foreground">Date</div>
+          <div className="text-xs text-muted-foreground">{t("form-date")}</div>
           <div className="text-sm font-medium">{treatment.date}</div>
         </div>
         <div>
-          <div className="text-xs text-muted-foreground">Status</div>
+          <div className="text-xs text-muted-foreground">
+            {t("status-label")}
+          </div>
           <Badge className={`mt-1 ${statusConfig.className}`}>
             {statusConfig.label}
           </Badge>
@@ -59,11 +65,11 @@ export function TreatmentRow({ treatment, onUpdateStatus }: TreatmentRowProps) {
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" size="sm">
-              Update status
+              {t("update-status")}
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent className="w-56">
-            <DropdownMenuLabel>Status</DropdownMenuLabel>
+            <DropdownMenuLabel>{t("filter-by-status")}</DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuCheckboxItem
               checked={treatment.status === "scheduled"}
@@ -71,7 +77,7 @@ export function TreatmentRow({ treatment, onUpdateStatus }: TreatmentRowProps) {
                 onUpdateStatus?.(treatment.id, "scheduled")
               }
             >
-              Scheduled
+              {t("status-scheduled")}
             </DropdownMenuCheckboxItem>
             <DropdownMenuCheckboxItem
               checked={treatment.status === "in_progress"}
@@ -79,7 +85,7 @@ export function TreatmentRow({ treatment, onUpdateStatus }: TreatmentRowProps) {
                 onUpdateStatus?.(treatment.id, "in_progress")
               }
             >
-              In Progress
+              {t("status-in-progress")}
             </DropdownMenuCheckboxItem>
             <DropdownMenuCheckboxItem
               checked={treatment.status === "completed"}
@@ -87,7 +93,7 @@ export function TreatmentRow({ treatment, onUpdateStatus }: TreatmentRowProps) {
                 onUpdateStatus?.(treatment.id, "completed")
               }
             >
-              Completed
+              {t("status-completed")}
             </DropdownMenuCheckboxItem>
           </DropdownMenuContent>
         </DropdownMenu>

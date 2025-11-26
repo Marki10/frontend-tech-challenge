@@ -3,6 +3,7 @@ import { EmptyState } from "./EmptyState";
 import { PaginationControls } from "./PaginationControls";
 import { Button } from "@/components/ui/button";
 import type { Treatment, TreatmentStatus, SortConfig } from "@/lib/types";
+import { useTranslations } from "next-intl";
 
 interface TreatmentsContentProps {
   filteredTreatments: Treatment[];
@@ -29,11 +30,13 @@ export function TreatmentsContent({
   onSort,
   onUpdateStatus,
 }: TreatmentsContentProps) {
+  const t = useTranslations();
+
   if (filteredTreatments.length === 0) {
     return (
       <EmptyState>
         <Button variant="outline" onClick={() => window.location.reload()}>
-          Clear filters
+          {t("treatments-clear-filters")}
         </Button>
       </EmptyState>
     );

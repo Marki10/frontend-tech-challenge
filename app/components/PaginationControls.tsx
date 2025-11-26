@@ -5,6 +5,7 @@ import {
   ChevronsLeft,
   ChevronsRight,
 } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 interface PaginationControlsProps {
   currentPage: number;
@@ -21,12 +22,14 @@ export function PaginationControls({
   className = "",
   disabled = false,
 }: PaginationControlsProps) {
+  const t = useTranslations();
+
   if (totalPages <= 1) return null;
 
   return (
     <div className={`flex items-center justify-between ${className}`}>
       <div className="text-sm text-muted-foreground">
-        Page {currentPage} of {totalPages}
+        {t("page-x-of-y", { currentPage, totalPages })}
       </div>
       <div className="flex items-center space-x-2">
         <Button
@@ -36,7 +39,7 @@ export function PaginationControls({
           disabled={disabled || currentPage === 1}
         >
           <ChevronsLeft className="h-4 w-4" />
-          <span className="sr-only">First page</span>
+          <span className="sr-only">{t("first-page")}</span>
         </Button>
         <Button
           variant="outline"
@@ -45,7 +48,7 @@ export function PaginationControls({
           disabled={disabled || currentPage === 1}
         >
           <ChevronLeft className="h-4 w-4" />
-          <span className="sr-only">Previous page</span>
+          <span className="sr-only">{t("previous-page")}</span>
         </Button>
         <Button
           variant="outline"
@@ -54,7 +57,7 @@ export function PaginationControls({
           disabled={disabled || currentPage === totalPages}
         >
           <ChevronRight className="h-4 w-4" />
-          <span className="sr-only">Next page</span>
+          <span className="sr-only">{t("next-page")}</span>
         </Button>
         <Button
           variant="outline"
@@ -63,7 +66,7 @@ export function PaginationControls({
           disabled={disabled || currentPage === totalPages}
         >
           <ChevronsRight className="h-4 w-4" />
-          <span className="sr-only">Last page</span>
+          <span className="sr-only">{t("last-page")}</span>
         </Button>
       </div>
     </div>

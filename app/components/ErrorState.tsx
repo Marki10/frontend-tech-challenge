@@ -1,16 +1,17 @@
 import { AlertCircle, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { ErrorStateProps } from "@/lib/component.types";
+import { useTranslations } from "next-intl";
 
 export function ErrorState({
   error,
   onRetry,
   className = "",
 }: ErrorStateProps) {
-  const title = "Something went wrong";
-  const description =
-    error?.message ||
-    "We couldn't load the treatments. Please try again later.";
+  const t = useTranslations();
+
+  const title = t("error-title");
+  const description = error?.message || t("error-description");
 
   return (
     <div
@@ -23,7 +24,7 @@ export function ErrorState({
         {onRetry && (
           <Button variant="outline" onClick={onRetry} className="gap-2">
             <RefreshCw className="h-4 w-4" />
-            Try again
+            {t("try-again")}
           </Button>
         )}
       </div>

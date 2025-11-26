@@ -24,16 +24,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
-
-const addTreatmentSchema = z.object({
-  patient: z.string().min(1, "Patient is required"),
-  procedure: z.string().min(1, "Procedure is required"),
-  dentist: z.string().min(1, "Dentist is required"),
-  date: z.string().min(1, "Date is required"),
-  notes: z.string().optional(),
-});
-
-type AddTreatmentFormValues = z.infer<typeof addTreatmentSchema>;
+import { useTranslations } from "next-intl";
 
 interface AddTreatmentDialogProps {
   children: React.ReactNode;
@@ -52,6 +43,17 @@ export function AddTreatmentDialog({
 }: AddTreatmentDialogProps) {
   const [open, setOpen] = React.useState(false);
   const [serverError, setServerError] = React.useState<string | null>(null);
+  const t = useTranslations();
+
+  const addTreatmentSchema = z.object({
+    patient: z.string().min(1, t("validation-patient-required")),
+    procedure: z.string().min(1, t("validation-procedure-required")),
+    dentist: z.string().min(1, t("validation-dentist-required")),
+    date: z.string().min(1, t("validation-date-required")),
+    notes: z.string().optional(),
+  });
+
+  type AddTreatmentFormValues = z.infer<typeof addTreatmentSchema>;
 
   const form = useForm<AddTreatmentFormValues>({
     resolver: zodResolver(addTreatmentSchema),
@@ -82,15 +84,15 @@ export function AddTreatmentDialog({
         const data = await response.json().catch(() => null as unknown);
         const message =
           (data && typeof data.message === "string" && data.message) ||
-          "Validation error";
+          t("errors-validation");
         setServerError(message);
         toast.error(message);
         return;
       }
 
       if (!response.ok) {
-        setServerError("Failed to save treatment");
-        toast.error("Failed to save treatment");
+        setServerError(t("errors-failed-to-save"));
+        toast.error(t("errors-failed-to-save"));
         return;
       }
 
@@ -104,12 +106,12 @@ export function AddTreatmentDialog({
         notes: values.notes ?? "",
       });
 
-      toast.success("Treatment added successfully");
+      toast.success(t("success-treatment-added"));
       setOpen(false);
       form.reset();
     } catch {
-      setServerError("Failed to save treatment");
-      toast.error("Failed to save treatment");
+      setServerError(t("errors-failed-to-save"));
+      toast.error(t("errors-failed-to-save"));
     }
   });
 
@@ -120,7 +122,7 @@ export function AddTreatmentDialog({
         <Form {...form}>
           <form onSubmit={handleSubmit}>
             <DialogHeader>
-              <DialogTitle>Add treatment</DialogTitle>
+              <DialogTitle>{t("treatments-add-dialog-title")}</DialogTitle>
             </DialogHeader>
 
             <div className="space-y-4 py-4">
@@ -129,9 +131,12 @@ export function AddTreatmentDialog({
                 name="patient"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Patient</FormLabel>
+                    <FormLabel>{t("form-patient")}</FormLabel>
                     <FormControl>
-                      <Input placeholder="Jane Doe" {...field} />
+                      <Input
+                        placeholder={t("placeholders-patient")}
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -143,9 +148,12 @@ export function AddTreatmentDialog({
                 name="procedure"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Procedure</FormLabel>
+                    <FormLabel>{t("form-procedure")}</FormLabel>
                     <FormControl>
-                      <Input placeholder="Filling" {...field} />
+                      <Input
+                        placeholder={t("placeholders-procedure")}
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -157,9 +165,12 @@ export function AddTreatmentDialog({
                 name="dentist"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Dentist</FormLabel>
+                    <FormLabel>{t("form-dentist")}</FormLabel>
                     <FormControl>
-                      <Input placeholder="Dr. Smith" {...field} />
+                      <Input
+                        placeholder={t("placeholders-dentist")}
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -171,7 +182,7 @@ export function AddTreatmentDialog({
                 name="date"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Date</FormLabel>
+                    <FormLabel>{t("form-date")}</FormLabel>
                     <FormControl>
                       <Input type="date" {...field} />
                     </FormControl>
@@ -185,10 +196,10 @@ export function AddTreatmentDialog({
                 name="notes"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Notes</FormLabel>
+                    <FormLabel>{t("form-notes")}</FormLabel>
                     <FormControl>
                       <Textarea
-                        placeholder="Add any treatment notes"
+                        placeholder={t("placeholders-notes")}
                         {...field}
                       />
                     </FormControl>
@@ -204,7 +215,7 @@ export function AddTreatmentDialog({
 
             <DialogFooter>
               <Button type="submit" disabled={isSubmitting}>
-                {isSubmitting ? "Saving..." : "Save treatment"}
+                {isSubmitting ? t("form-saving") : t("form-save-treatment")}
               </Button>
             </DialogFooter>
           </form>

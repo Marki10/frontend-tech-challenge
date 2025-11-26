@@ -1,5 +1,6 @@
-import { useState, useEffect, useCallback, useRef } from "react";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useState, useEffect, useCallback, useRef, startTransition } from "react";
+import { useSearchParams } from "next/navigation";
+import { usePathname, useRouter } from "@/routing";
 import type { Treatment, TreatmentStatus, TreatmentsState } from "@/lib/types";
 import { CreateTreatmentRequest } from "@/lib/api.types";
 import { toast } from "sonner";
@@ -102,10 +103,6 @@ export function useTreatments() {
 
         const queryString = params.toString();
 
-        router.replace(queryString ? `${pathname}?${queryString}` : pathname, {
-          scroll: false,
-        });
-
         const cached = cacheRef.current.get(queryString);
         if (cached) {
           setState((prev) => ({
@@ -180,7 +177,7 @@ export function useTreatments() {
     };
 
     fetchTreatments();
-  }, [filters, sort, pagination.page, pagination.pageSize, pathname, router]);
+  }, [filters, sort, pagination.page, pagination.pageSize]);
 
   const handleAddTreatment = useCallback(
     async (data: CreateTreatmentRequest) => {
@@ -265,30 +262,81 @@ export function useTreatments() {
   );
 
   const setSearch = useCallback((search: string) => {
-    setState((prev) => ({
-      ...prev,
-      filters: {
-        ...prev.filters,
-        search: search || "",
-      },
-      pagination: { ...prev.pagination, page: 1 },
-    }));
-  }, []);
+    setState((prev) => {
+      startTransition(() => {
+        const params = new URLSearchParams();
+        if (search?.trim()) {
+          params.set("search", search.trim());
+        }
+        if (prev.filters.status && prev.filters.status !== "all") {
+          params.set("status", prev.filters.status);
+        }
+        params.set("page", "1");
+        params.set("pageSize", String(prev.pagination.pageSize));
+        const queryString = params.toString();
+        const fullPath = queryString ? `${pathname}?${queryString}` : pathname;
+        router.replace(fullPath, { scroll: false });
+      });
+      
+      return {
+        ...prev,
+        filters: {
+          ...prev.filters,
+          search: search || "",
+        },
+        pagination: { ...prev.pagination, page: 1 },
+      };
+    });
+  }, [pathname, router]);
 
   const setStatus = useCallback((status: TreatmentStatus | "all") => {
-    setState((prev) => ({
-      ...prev,
-      filters: { ...prev.filters, status },
-      pagination: { ...prev.pagination, page: 1 },
-    }));
-  }, []);
+    setState((prev) => {
+      startTransition(() => {
+        const params = new URLSearchParams();
+        if (prev.filters.search?.trim()) {
+          params.set("search", prev.filters.search.trim());
+        }
+        if (status && status !== "all") {
+          params.set("status", status);
+        }
+        params.set("page", "1");
+        params.set("pageSize", String(prev.pagination.pageSize));
+        const queryString = params.toString();
+        const fullPath = queryString ? `${pathname}?${queryString}` : pathname;
+        router.replace(fullPath, { scroll: false });
+      });
+      
+      return {
+        ...prev,
+        filters: { ...prev.filters, status },
+        pagination: { ...prev.pagination, page: 1 },
+      };
+    });
+  }, [pathname, router]);
 
   const setCurrentPage = useCallback((page: number) => {
-    setState((prev) => ({
-      ...prev,
-      pagination: { ...prev.pagination, page },
-    }));
-  }, []);
+    setState((prev) => {
+      startTransition(() => {
+        const params = new URLSearchParams();
+        if (prev.filters.search?.trim()) {
+          params.set("search", prev.filters.search.trim());
+        }
+        if (prev.filters.status && prev.filters.status !== "all") {
+          params.set("status", prev.filters.status);
+        }
+        params.set("page", String(page));
+        params.set("pageSize", String(prev.pagination.pageSize));
+        const queryString = params.toString();
+        const fullPath = queryString ? `${pathname}?${queryString}` : pathname;
+        router.replace(fullPath, { scroll: false });
+      });
+      
+      return {
+        ...prev,
+        pagination: { ...prev.pagination, page },
+      };
+    });
+  }, [pathname, router]);
 
   const handleSort = useCallback((field: string) => {
     setState((prev) => ({

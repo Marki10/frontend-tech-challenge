@@ -1,16 +1,14 @@
-// app/page.tsx
 "use client";
 
-import { Header } from "./components/Header";
-import { FiltersSection } from "./components/FiltersSection";
-import { TreatmentsContent } from "./components/TreatmentsContent";
-import { ErrorState } from "./components/ErrorState";
+import { Header } from "../components/Header";
+import { FiltersSection } from "../components/FiltersSection";
+import { TreatmentsContent } from "../components/TreatmentsContent";
+import { ErrorState } from "../components/ErrorState";
 import {
   TreatmentsProvider,
   useTreatmentsContext,
-} from "./context/TreatmentsContext";
+} from "../context/TreatmentsContext";
 
-// Create a separate component for the page content that uses the context
 function TreatmentsPageContent() {
   const {
     filteredItems,
@@ -64,7 +62,6 @@ function TreatmentsPageContent() {
   );
 }
 
-// The main page component that wraps everything with the provider
 export default function TreatmentsPage() {
   return (
     <TreatmentsProvider>

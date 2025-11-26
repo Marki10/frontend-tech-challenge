@@ -1,6 +1,7 @@
 import { TreatmentRow } from "./TreatmentRow";
 import type { TreatmentsTableProps } from "@/lib/component.types";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useTranslations } from "next-intl";
 
 export function TreatmentsTable({
   treatments,
@@ -9,6 +10,7 @@ export function TreatmentsTable({
   filteredCount,
   onUpdateStatus,
 }: TreatmentsTableProps) {
+  const t = useTranslations();
   if (isLoading) {
     return (
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
@@ -33,7 +35,7 @@ export function TreatmentsTable({
   return (
     <>
       <div className="text-sm text-muted-foreground">
-        Showing {filteredCount} of {total} treatments
+        {t("showing-x-of-y-treatments", { filteredCount, total })}
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
