@@ -116,7 +116,13 @@ export function useFetchTreatments({
           },
         }));
       } catch (err) {
-        if ((err as { name?: string } | null)?.name === "AbortError") {
+        const isAbort =
+          err instanceof DOMException && err.name === "AbortError" ||
+          err instanceof Error && err.name === "AbortError" ||
+          (err && typeof err === "object" && "name" in err && err.name === "AbortError") ||
+          (err && typeof err === "object" && "message" in err && typeof err.message === "string" && err.message.includes("aborted"));
+
+        if (isAbort) {
           return;
         }
 

@@ -36,6 +36,24 @@ export interface TreatmentsApiResult {
   totalPages: number;
 }
 
+function isAbortError(error: unknown): boolean {
+  if (error instanceof DOMException && error.name === "AbortError") {
+    return true;
+  }
+  if (error instanceof Error && error.name === "AbortError") {
+    return true;
+  }
+  if (
+    error &&
+    typeof error === "object" &&
+    ("name" in error && error.name === "AbortError" ||
+     "message" in error && typeof error.message === "string" && error.message.includes("aborted"))
+  ) {
+    return true;
+  }
+  return false;
+}
+
 export async function fetchTreatmentsApi(
   queryString: string,
   fallbackPage: number,
@@ -72,9 +90,14 @@ export async function fetchTreatmentsApi(
       totalPages: data.totalPages ?? 0,
     };
   } catch (error) {
+    if (isAbortError(error)) {
+      throw error;
+    }
+
     if (error instanceof ApiError) {
       throw error;
     }
+
     if (error instanceof TypeError && error.message.includes("fetch")) {
       throw ApiError.fromNetworkError("Network error occurred");
     }
