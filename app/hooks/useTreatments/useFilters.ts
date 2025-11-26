@@ -5,11 +5,10 @@ import type { TreatmentStatus, Treatment } from "@/lib/types";
 import type { TreatmentsStateType } from "./types";
 
 interface UseFiltersProps {
-  state: TreatmentsStateType;
   setState: React.Dispatch<React.SetStateAction<TreatmentsStateType>>;
 }
 
-export function useFilters({ state, setState }: UseFiltersProps) {
+export function useFilters({ setState }: UseFiltersProps) {
   const router = useRouter();
   const pathname = usePathname();
 

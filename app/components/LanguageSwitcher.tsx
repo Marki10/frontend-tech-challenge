@@ -16,6 +16,8 @@ export function LanguageSwitcher() {
   const locale = useLocale();
 
   const switchLanguage = (newLocale: string) => {
+    if (typeof window === "undefined") return;
+    
     const url = new URL(window.location.href);
     const pathSegments = url.pathname.split("/").filter(Boolean);
     
@@ -23,6 +25,7 @@ export function LanguageSwitcher() {
     const pathWithoutLocale = cleanSegments.length === 0 ? "/" : "/" + cleanSegments.join("/");
     const newPath = `/${newLocale}${pathWithoutLocale === "/" ? "" : pathWithoutLocale}`;
     
+    // eslint-disable-next-line react-hooks/immutability
     window.location.href = `${newPath}${url.search}`;
   };
 

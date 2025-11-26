@@ -116,7 +116,7 @@
       "procedure": "Gum Contouring",
       "dentist": "Dr. Hart",
       "date": "2025-03-01",
-      "status": "scheduled",
+      "status": "in_progress",
       "notes": "Discuss sedation options.",
       "cost": 450
     },

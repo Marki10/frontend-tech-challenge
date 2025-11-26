@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -38,11 +38,12 @@ export function TreatmentRow({ treatment, onUpdateStatus, isUpdating = false }: 
   const status = (treatment.status || "scheduled") as TreatmentStatus;
   const statusConfig = TREATMENT_STATUS_CONFIG[status];
 
-  useEffect(() => {
-    if (isUpdating) {
-      setIsDropdownOpen(false);
+  const controlledOpen = isUpdating ? false : isDropdownOpen;
+  const handleOpenChange = (open: boolean) => {
+    if (!isUpdating) {
+      setIsDropdownOpen(open);
     }
-  }, [isUpdating]);
+  };
 
   return (
     <Card
@@ -86,7 +87,7 @@ export function TreatmentRow({ treatment, onUpdateStatus, isUpdating = false }: 
         ) : null}
       </CardContent>
       <CardFooter className="pt-3">
-        <DropdownMenu open={isUpdating ? false : isDropdownOpen} onOpenChange={(open) => !isUpdating && setIsDropdownOpen(open)}>
+        <DropdownMenu open={controlledOpen} onOpenChange={handleOpenChange}>
           <DropdownMenuTrigger asChild>
             <Button
               variant="outline"

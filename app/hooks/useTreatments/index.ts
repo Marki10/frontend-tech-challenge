@@ -18,7 +18,6 @@ export function useTreatments() {
   });
 
   const { setSearch, setStatus, setCurrentPage, handleSort } = useFilters({
-    state,
     setState,
   });
 

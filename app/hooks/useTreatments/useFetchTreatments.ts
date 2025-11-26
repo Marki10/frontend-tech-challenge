@@ -113,6 +113,6 @@ export function useFetchTreatments({
     };
 
     fetchTreatments();
-  }, [filters, sort, pagination.page, pagination.pageSize, setState]);
+  }, [filters, sort, pagination.page, pagination.pageSize, pagination.totalPages, setState]);
 }
 

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { useTranslations } from "next-intl";
 import { useDebouncedCallback } from "@/hooks/useDebounce";
@@ -16,9 +16,7 @@ export function SearchBar({ value, onChange, placeholder, debounceMs = 300 }: Se
   const [localValue, setLocalValue] = useState<string>(value || "");
   const debouncedOnChange = useDebouncedCallback(onChange, debounceMs);
 
-  useEffect(() => {
-    setLocalValue(value || "");
-  }, [value]);
+  const displayValue = value !== undefined ? value : localValue;
 
   const handleChange = (newValue: string) => {
     setLocalValue(newValue);
@@ -26,14 +24,19 @@ export function SearchBar({ value, onChange, placeholder, debounceMs = 300 }: Se
   };
 
   return (
-    <Input
-      type="search"
-      placeholder={defaultPlaceholder}
-      value={localValue}
-      onChange={(e) => handleChange(e.target.value)}
-      className="w-full md:w-[300px]"
-      aria-label={t("aria-search-label")}
-      aria-describedby="search-description"
-    />
+    <>
+      <Input
+        type="search"
+        placeholder={defaultPlaceholder}
+        value={displayValue}
+        onChange={(e) => handleChange(e.target.value)}
+        className="w-full md:w-[300px]"
+        aria-label={t("aria-search-label")}
+        aria-describedby="search-description"
+      />
+      <span id="search-description" className="sr-only">
+        {t("aria-search-description")}
+      </span>
+    </>
   );
 }
