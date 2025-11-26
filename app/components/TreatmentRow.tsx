@@ -17,6 +17,11 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Tooltip,
+  TooltipTrigger,
+  TooltipContent,
+} from "@/components/ui/tooltip";
 import type { Treatment, TreatmentStatus } from "@/lib/types";
 import { TREATMENT_STATUS_CONFIG } from "@/lib/treatmentStatusConfig";
 import { useTranslations } from "next-intl";
@@ -43,31 +48,34 @@ export function TreatmentRow({ treatment, onUpdateStatus }: TreatmentRowProps) {
         <CardDescription className="text-xs">{treatment.procedure}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-2 pb-2">
-        <div>
-          <div className="text-xs text-muted-foreground">
-            {t("form-dentist")}
-          </div>
-          <div className="text-sm font-medium">{treatment.dentist}</div>
+        <div className="text-sm">
+          <span className="text-xs text-muted-foreground">{t("form-dentist")}: </span>
+          <span className="font-medium">{treatment.dentist}</span>
         </div>
-        <div>
-          <div className="text-xs text-muted-foreground">{t("form-date")}</div>
-          <div className="text-sm font-medium">{treatment.date}</div>
+        <div className="text-sm">
+          <span className="text-xs text-muted-foreground">{t("form-date")}: </span>
+          <span className="font-medium">{treatment.date}</span>
         </div>
-        <div>
-          <div className="text-xs text-muted-foreground">
-            {t("status-label")}
-          </div>
+        <div className="text-sm">
+          <span className="text-xs text-muted-foreground">{t("status-label")}: </span>
           <Badge
-            className={`mt-1 ${statusConfig.className}`}
+            className={`${statusConfig.className}`}
             aria-label={t("aria-status-current", { status: statusConfig.label })}
           >
             {statusConfig.label}
           </Badge>
         </div>
         {treatment.notes ? (
-          <p className="text-sm leading-relaxed text-muted-foreground">
-            {treatment.notes}
-          </p>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <p className="text-sm text-muted-foreground truncate" title={treatment.notes}>
+                {treatment.notes}
+              </p>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p className="max-w-xs whitespace-normal">{treatment.notes}</p>
+            </TooltipContent>
+          </Tooltip>
         ) : null}
       </CardContent>
       <CardFooter className="pt-3">

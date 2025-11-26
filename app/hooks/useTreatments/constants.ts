@@ -1,6 +1,6 @@
 import type { TreatmentsState } from "@/lib/types";
 
-export const ITEMS_PER_PAGE = 10;
+export const ITEMS_PER_PAGE = 12;
 
 export const initialState: Omit<TreatmentsState, "pagination"> & {
   pagination: {
