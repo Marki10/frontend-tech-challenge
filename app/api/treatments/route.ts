@@ -41,11 +41,17 @@ export async function GET(request: Request) {
         parsePositiveInteger(searchParams.get("pageSize"), DEFAULT_PAGE_SIZE),
         MAX_PAGE_SIZE
       );
-      const status = searchParams.get("status") as TreatmentStatus | "all";
-      const filteredByStatus =
-        status && status !== "all"
-          ? treatments.filter((item) => item.status === status)
-          : treatments;
+      const statusParam = searchParams.get("status");
+      let filteredByStatus = treatments;
+      
+      if (statusParam && statusParam !== "all") {
+        const statusArray = statusParam.split(",").filter(Boolean) as TreatmentStatus[];
+        if (statusArray.length > 0) {
+          filteredByStatus = treatments.filter((item) => 
+            item.status && statusArray.includes(item.status)
+          );
+        }
+      }
 
       const filtered = search
         ? filteredByStatus.filter((item) => {

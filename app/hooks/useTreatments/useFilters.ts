@@ -29,8 +29,8 @@ export function useFilters({ state, setState }: UseFiltersProps) {
           if (search?.trim()) {
             params.set("search", search.trim());
           }
-          if (prev.filters.status && prev.filters.status !== "all") {
-            params.set("status", prev.filters.status);
+          if (prev.filters.status && prev.filters.status !== "all" && Array.isArray(prev.filters.status) && prev.filters.status.length > 0) {
+            params.set("status", prev.filters.status.join(","));
           }
           params.set("page", "1");
           params.set("pageSize", String(prev.pagination.pageSize));
@@ -51,15 +51,15 @@ export function useFilters({ state, setState }: UseFiltersProps) {
   );
 
   const setStatus = useCallback(
-    (status: TreatmentStatus | "all") => {
+    (status: TreatmentStatus[] | "all") => {
       setState((prev: any) => {
         startTransition(() => {
           const params = new URLSearchParams();
           if (prev.filters.search?.trim()) {
             params.set("search", prev.filters.search.trim());
           }
-          if (status && status !== "all") {
-            params.set("status", status);
+          if (status && status !== "all" && status.length > 0) {
+            params.set("status", status.join(","));
           }
           params.set("page", "1");
           params.set("pageSize", String(prev.pagination.pageSize));
@@ -84,8 +84,8 @@ export function useFilters({ state, setState }: UseFiltersProps) {
           if (prev.filters.search?.trim()) {
             params.set("search", prev.filters.search.trim());
           }
-          if (prev.filters.status && prev.filters.status !== "all") {
-            params.set("status", prev.filters.status);
+          if (prev.filters.status && prev.filters.status !== "all" && Array.isArray(prev.filters.status) && prev.filters.status.length > 0) {
+            params.set("status", prev.filters.status.join(","));
           }
           params.set("page", String(page));
           params.set("pageSize", String(prev.pagination.pageSize));

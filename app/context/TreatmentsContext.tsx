@@ -12,7 +12,7 @@ interface TreatmentsContextType {
   error: Error | null;
   filters: {
     search?: string;
-    status?: TreatmentStatus | "all";
+    status?: TreatmentStatus[] | "all";
   };
   sort: SortConfig;
   pagination: {
@@ -27,7 +27,7 @@ interface TreatmentsContextType {
   ) => Promise<boolean>;
   updateTreatmentStatus: (id: number, status: TreatmentStatus) => Promise<void>;
   setSearch: (search: string) => void;
-  setStatus: (status: TreatmentStatus | "all") => void;
+  setStatus: (status: TreatmentStatus[] | "all") => void;
   setCurrentPage: (page: number) => void;
   handleSort: (field: string) => void;
 }

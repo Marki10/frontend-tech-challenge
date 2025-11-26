@@ -30,8 +30,8 @@ export function useFetchTreatments({
           params.set("search", filters.search.trim());
         }
 
-        if (filters.status && filters.status !== "all") {
-          params.set("status", filters.status);
+        if (filters.status && filters.status !== "all" && Array.isArray(filters.status) && filters.status.length > 0) {
+          params.set("status", filters.status.join(","));
         }
 
         params.set("page", String(pagination.page));

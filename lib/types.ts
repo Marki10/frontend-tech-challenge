@@ -36,7 +36,7 @@ export interface PaginationParams {
 
 export interface FilterParams {
   search?: string;
-  status?: TreatmentStatus | "all";
+  status?: TreatmentStatus[] | "all";
   dateFrom?: string;
   dateTo?: string;
 }

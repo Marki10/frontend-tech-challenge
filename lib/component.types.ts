@@ -31,8 +31,8 @@ export interface SearchBarProps {
 }
 
 export interface StatusFilterProps {
-  value: TreatmentStatus | "all";
-  onChange: (value: TreatmentStatus | "all") => void;
+  value: TreatmentStatus[] | "all" | undefined;
+  onChange: (value: TreatmentStatus[] | "all") => void;
   className?: string;
 }
 

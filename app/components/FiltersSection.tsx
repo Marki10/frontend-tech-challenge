@@ -8,8 +8,8 @@ import { useTranslations } from "next-intl";
 interface FiltersSectionProps {
   search: string | undefined;
   onSearchChange: (value: string) => void;
-  status: TreatmentStatus | "all" | undefined;
-  onStatusChange: (value: TreatmentStatus | "all") => void;
+  status: TreatmentStatus[] | "all" | undefined;
+  onStatusChange: (value: TreatmentStatus[] | "all") => void;
   onAddTreatment: (data: {
     patient: string;
     procedure: string;

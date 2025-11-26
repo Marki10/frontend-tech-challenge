@@ -11,9 +11,16 @@ export function useUrlSync({ setState }: UseUrlSyncProps) {
 
   useEffect(() => {
     const urlSearch = (searchParams.get("search") || "").trim();
-    const urlStatus = (searchParams.get("status") || "all") as
-      | TreatmentStatus
-      | "all";
+    const urlStatusParam = searchParams.get("status");
+    let urlStatus: TreatmentStatus[] | "all" = "all";
+    
+    if (urlStatusParam && urlStatusParam !== "all") {
+      const statusArray = urlStatusParam.split(",").filter(Boolean) as TreatmentStatus[];
+      if (statusArray.length > 0) {
+        urlStatus = statusArray;
+      }
+    }
+    
     const urlPage = Number.parseInt(searchParams.get("page") || "1", 10);
 
     setState((prev: any) => {
@@ -22,7 +29,7 @@ export function useUrlSync({ setState }: UseUrlSyncProps) {
         filters: {
           ...prev.filters,
           search: urlSearch || prev.filters.search,
-          status: (urlStatus || prev.filters.status) as TreatmentStatus | "all",
+          status: urlStatus || prev.filters.status,
         },
         pagination: {
           ...prev.pagination,

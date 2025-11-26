@@ -32,6 +32,20 @@ export function TreatmentsContent({
 }: TreatmentsContentProps) {
   const t = useTranslations();
 
+  if (isLoading) {
+    return (
+      <TreatmentsTable
+        treatments={[]}
+        isLoading={true}
+        total={0}
+        filteredCount={0}
+        sortConfig={sortConfig}
+        onSort={onSort}
+        onUpdateStatus={onUpdateStatus}
+      />
+    );
+  }
+
   if (filteredTreatments.length === 0) {
     return (
       <EmptyState>

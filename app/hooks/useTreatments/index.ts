@@ -6,7 +6,7 @@ import { useFilters } from "./useFilters";
 import { useTreatmentActions } from "./useTreatmentActions";
 
 export function useTreatments() {
-  const [state, setState] = useState(initialState);
+  const [state, setState] = useState<typeof initialState>(initialState);
 
   useUrlSync({ setState });
   

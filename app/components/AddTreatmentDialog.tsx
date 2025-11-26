@@ -32,7 +32,7 @@ export function AddTreatmentDialog({
   children,
   onSubmit,
 }: AddTreatmentDialogProps) {
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState<boolean>(false);
   const t = useTranslations();
 
   const { form, handleSubmit, serverError, isSubmitting } = useAddTreatmentForm({

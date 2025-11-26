@@ -31,12 +31,12 @@ export function TreatmentRow({ treatment, onUpdateStatus }: TreatmentRowProps) {
   const statusConfig = TREATMENT_STATUS_CONFIG[status];
 
   return (
-    <Card className="shadow-sm">
-      <CardHeader>
-        <CardTitle>{treatment.patient}</CardTitle>
-        <CardDescription>{treatment.procedure}</CardDescription>
+    <Card className="gap-3 py-3 shadow-sm">
+      <CardHeader className="pb-2">
+        <CardTitle className="text-base">{treatment.patient}</CardTitle>
+        <CardDescription className="text-xs">{treatment.procedure}</CardDescription>
       </CardHeader>
-      <CardContent className="space-y-3">
+      <CardContent className="space-y-2 pb-2">
         <div>
           <div className="text-xs text-muted-foreground">
             {t("form-dentist")}
@@ -61,7 +61,7 @@ export function TreatmentRow({ treatment, onUpdateStatus }: TreatmentRowProps) {
           </p>
         ) : null}
       </CardContent>
-      <CardFooter>
+      <CardFooter className="pt-3">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" size="sm">

@@ -28,14 +28,14 @@ function TreatmentsPageContent() {
 
   if (error) {
     return (
-      <div className="container mx-auto flex flex-col gap-6 py-10">
+      <div className="container mx-auto flex flex-col gap-6 px-2.5 py-10">
         <ErrorState error={error} onRetry={() => window.location.reload()} />
       </div>
     );
   }
 
   return (
-    <div className="container mx-auto flex flex-col gap-6 py-10">
+    <div className="container mx-auto flex flex-col gap-6 px-2.5 py-10">
       <Header />
 
       <FiltersSection

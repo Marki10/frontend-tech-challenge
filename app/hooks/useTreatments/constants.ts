@@ -13,7 +13,7 @@ export const initialState: Omit<TreatmentsState, "pagination"> & {
   items: [],
   filteredItems: [],
   paginatedItems: [],
-  isLoading: false,
+  isLoading: true,
   error: null,
   filters: {
     search: "",

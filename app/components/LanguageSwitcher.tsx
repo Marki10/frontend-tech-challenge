@@ -8,14 +8,11 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useRouter, usePathname } from "@/routing";
 import { useLocale } from "next-intl";
 import { languages, localeCodes } from "@/lib/locale-config";
 import { CountryFlag } from "./CountryFlag";
 
 export function LanguageSwitcher() {
-  const router = useRouter();
-  const pathname = usePathname();
   const locale = useLocale();
 
   const switchLanguage = (newLocale: string) => {
