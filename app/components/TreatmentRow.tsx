@@ -87,7 +87,7 @@ export function TreatmentRow({ treatment, onUpdateStatus, isUpdating = false }: 
         ) : null}
       </CardContent>
       <CardFooter className="pt-3">
-        <DropdownMenu open={controlledOpen} onOpenChange={handleOpenChange}>
+        <DropdownMenu open={controlledOpen} onOpenChange={handleOpenChange} modal={false}>
           <DropdownMenuTrigger asChild>
             <Button
               variant="outline"

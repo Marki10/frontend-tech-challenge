@@ -72,7 +72,7 @@ export function StatusFilter({ value, onChange }: StatusFilterProps) {
       : t("aria-status-count", { count: selectedStatuses.length });
 
   return (
-    <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
+    <DropdownMenu open={isOpen} onOpenChange={setIsOpen} modal={false}>
       <DropdownMenuTrigger asChild>
         <Button
           variant="outline"

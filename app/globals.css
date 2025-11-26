@@ -123,6 +123,10 @@ button,
   }
   body {
     @apply bg-background text-foreground;
+    scrollbar-gutter: stable;
+  }
+  html {
+    scrollbar-gutter: stable;
   }
 }
 

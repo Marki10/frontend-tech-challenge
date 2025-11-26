@@ -30,7 +30,7 @@ export function LanguageSwitcher() {
   };
 
   return (
-    <DropdownMenu>
+    <DropdownMenu modal={false}>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" size="icon" className="gap-2">
           <Languages className="h-4 w-4" />
