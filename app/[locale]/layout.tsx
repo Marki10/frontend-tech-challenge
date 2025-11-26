@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { notFound } from "next/navigation";
 import "../globals.css";
 import { localeCodes, defaultLocale } from "@/lib/locale-config";
+import { Toaster } from "@/components/ui/sonner";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -44,6 +45,7 @@ export default async function LocaleLayout({
       >
         <NextIntlClientProvider locale={validLocale} messages={messages}>
           {children}
+          <Toaster position="bottom-center" duration={3000} />
         </NextIntlClientProvider>
       </body>
     </html>

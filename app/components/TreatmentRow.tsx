@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -29,13 +29,20 @@ import { useTranslations } from "next-intl";
 interface TreatmentRowProps {
   treatment: Treatment;
   onUpdateStatus?: (id: number, status: TreatmentStatus) => void;
+  isUpdating?: boolean;
 }
 
-export function TreatmentRow({ treatment, onUpdateStatus }: TreatmentRowProps) {
+export function TreatmentRow({ treatment, onUpdateStatus, isUpdating = false }: TreatmentRowProps) {
   const t = useTranslations();
   const [isDropdownOpen, setIsDropdownOpen] = useState<boolean>(false);
   const status = (treatment.status || "scheduled") as TreatmentStatus;
   const statusConfig = TREATMENT_STATUS_CONFIG[status];
+
+  useEffect(() => {
+    if (isUpdating) {
+      setIsDropdownOpen(false);
+    }
+  }, [isUpdating]);
 
   return (
     <Card
@@ -79,16 +86,17 @@ export function TreatmentRow({ treatment, onUpdateStatus }: TreatmentRowProps) {
         ) : null}
       </CardContent>
       <CardFooter className="pt-3">
-        <DropdownMenu open={isDropdownOpen} onOpenChange={setIsDropdownOpen}>
+        <DropdownMenu open={isUpdating ? false : isDropdownOpen} onOpenChange={(open) => !isUpdating && setIsDropdownOpen(open)}>
           <DropdownMenuTrigger asChild>
             <Button
               variant="outline"
               size="sm"
+              disabled={isUpdating}
               aria-label={t("aria-update-status-label", { patient: treatment.patient })}
               aria-haspopup="true"
               aria-expanded={isDropdownOpen}
             >
-              {t("update-status")}
+              {isUpdating ? t("form-saving") || "Saving..." : t("update-status")}
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent className="w-56" role="menu">
@@ -96,8 +104,9 @@ export function TreatmentRow({ treatment, onUpdateStatus }: TreatmentRowProps) {
             <DropdownMenuSeparator />
             <DropdownMenuCheckboxItem
               checked={treatment.status === "scheduled"}
+              disabled={isUpdating}
               onCheckedChange={() =>
-                onUpdateStatus?.(treatment.id, "scheduled")
+                !isUpdating && onUpdateStatus?.(treatment.id, "scheduled")
               }
               role="menuitemcheckbox"
             >
@@ -105,8 +114,9 @@ export function TreatmentRow({ treatment, onUpdateStatus }: TreatmentRowProps) {
             </DropdownMenuCheckboxItem>
             <DropdownMenuCheckboxItem
               checked={treatment.status === "in_progress"}
+              disabled={isUpdating}
               onCheckedChange={() =>
-                onUpdateStatus?.(treatment.id, "in_progress")
+                !isUpdating && onUpdateStatus?.(treatment.id, "in_progress")
               }
               role="menuitemcheckbox"
             >
@@ -114,8 +124,9 @@ export function TreatmentRow({ treatment, onUpdateStatus }: TreatmentRowProps) {
             </DropdownMenuCheckboxItem>
             <DropdownMenuCheckboxItem
               checked={treatment.status === "completed"}
+              disabled={isUpdating}
               onCheckedChange={() =>
-                onUpdateStatus?.(treatment.id, "completed")
+                !isUpdating && onUpdateStatus?.(treatment.id, "completed")
               }
               role="menuitemcheckbox"
             >

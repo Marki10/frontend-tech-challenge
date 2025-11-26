@@ -16,6 +16,7 @@ interface TreatmentsContentProps {
   sortConfig?: SortConfig;
   onSort?: (field: string) => void;
   onUpdateStatus?: (id: number, status: TreatmentStatus) => void;
+  updatingStatusIds: Set<number>;
 }
 
 export function TreatmentsContent({
@@ -29,6 +30,7 @@ export function TreatmentsContent({
   sortConfig,
   onSort,
   onUpdateStatus,
+  updatingStatusIds,
 }: TreatmentsContentProps) {
   const t = useTranslations();
 
@@ -42,6 +44,7 @@ export function TreatmentsContent({
         sortConfig={sortConfig}
         onSort={onSort}
         onUpdateStatus={onUpdateStatus}
+        updatingStatusIds={updatingStatusIds}
       />
     );
   }
@@ -66,6 +69,7 @@ export function TreatmentsContent({
         sortConfig={sortConfig}
         onSort={onSort}
         onUpdateStatus={onUpdateStatus}
+        updatingStatusIds={updatingStatusIds}
       />
       <PaginationControls
         currentPage={currentPage}

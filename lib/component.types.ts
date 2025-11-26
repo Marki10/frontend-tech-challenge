@@ -10,6 +10,7 @@ export interface TreatmentsTableProps {
   onSort?: (field: string) => void;
   className?: string;
   onUpdateStatus?: (id: number, status: TreatmentStatus) => void;
+  updatingStatusIds?: Set<number>;
 }
 
 export interface TreatmentRowProps {

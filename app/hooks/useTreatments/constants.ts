@@ -9,6 +9,7 @@ export const initialState: Omit<TreatmentsState, "pagination"> & {
     total: number;
     totalPages: number;
   };
+  updatingStatusIds: Set<number>;
 } = {
   items: [],
   filteredItems: [],
@@ -29,6 +30,7 @@ export const initialState: Omit<TreatmentsState, "pagination"> & {
     total: 0,
     totalPages: 0,
   },
+  updatingStatusIds: new Set<number>(),
 };
 
 export type TreatmentsStateType = typeof initialState;

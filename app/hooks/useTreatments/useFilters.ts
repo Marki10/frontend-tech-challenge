@@ -25,20 +25,7 @@ export function useFilters({ state, setState }: UseFiltersProps) {
   const setSearch = useCallback(
     (search: string) => {
       setState((prev) => {
-        startTransition(() => {
-          const params = new URLSearchParams();
-          if (search?.trim()) {
-            params.set("search", search.trim());
-          }
-          if (prev.filters.status && prev.filters.status !== "all" && Array.isArray(prev.filters.status) && prev.filters.status.length > 0) {
-            params.set("status", prev.filters.status.join(","));
-          }
-          params.set("page", "1");
-          params.set("pageSize", String(prev.pagination.pageSize));
-          updateUrl(params);
-        });
-
-        return {
+        const newState = {
           ...prev,
           filters: {
             ...prev.filters,
@@ -46,6 +33,21 @@ export function useFilters({ state, setState }: UseFiltersProps) {
           },
           pagination: { ...prev.pagination, page: 1 },
         };
+
+        startTransition(() => {
+          const params = new URLSearchParams();
+          if (search?.trim()) {
+            params.set("search", search.trim());
+          }
+          if (newState.filters.status && newState.filters.status !== "all" && Array.isArray(newState.filters.status) && newState.filters.status.length > 0) {
+            params.set("status", newState.filters.status.join(","));
+          }
+          params.set("page", "1");
+          params.set("pageSize", String(newState.pagination.pageSize));
+          updateUrl(params);
+        });
+
+        return newState;
       });
     },
     [setState, updateUrl]
@@ -54,24 +56,26 @@ export function useFilters({ state, setState }: UseFiltersProps) {
   const setStatus = useCallback(
     (status: TreatmentStatus[] | "all") => {
       setState((prev) => {
+        const newState = {
+          ...prev,
+          filters: { ...prev.filters, status },
+          pagination: { ...prev.pagination, page: 1 },
+        };
+
         startTransition(() => {
           const params = new URLSearchParams();
-          if (prev.filters.search?.trim()) {
-            params.set("search", prev.filters.search.trim());
+          if (newState.filters.search?.trim()) {
+            params.set("search", newState.filters.search.trim());
           }
           if (status && status !== "all" && status.length > 0) {
             params.set("status", status.join(","));
           }
           params.set("page", "1");
-          params.set("pageSize", String(prev.pagination.pageSize));
+          params.set("pageSize", String(newState.pagination.pageSize));
           updateUrl(params);
         });
 
-        return {
-          ...prev,
-          filters: { ...prev.filters, status },
-          pagination: { ...prev.pagination, page: 1 },
-        };
+        return newState;
       });
     },
     [setState, updateUrl]
@@ -80,23 +84,25 @@ export function useFilters({ state, setState }: UseFiltersProps) {
   const setCurrentPage = useCallback(
     (page: number) => {
       setState((prev) => {
-        startTransition(() => {
-          const params = new URLSearchParams();
-          if (prev.filters.search?.trim()) {
-            params.set("search", prev.filters.search.trim());
-          }
-          if (prev.filters.status && prev.filters.status !== "all" && Array.isArray(prev.filters.status) && prev.filters.status.length > 0) {
-            params.set("status", prev.filters.status.join(","));
-          }
-          params.set("page", String(page));
-          params.set("pageSize", String(prev.pagination.pageSize));
-          updateUrl(params);
-        });
-
-        return {
+        const newState = {
           ...prev,
           pagination: { ...prev.pagination, page },
         };
+
+        startTransition(() => {
+          const params = new URLSearchParams();
+          if (newState.filters.search?.trim()) {
+            params.set("search", newState.filters.search.trim());
+          }
+          if (newState.filters.status && newState.filters.status !== "all" && Array.isArray(newState.filters.status) && newState.filters.status.length > 0) {
+            params.set("status", newState.filters.status.join(","));
+          }
+          params.set("page", String(page));
+          params.set("pageSize", String(newState.pagination.pageSize));
+          updateUrl(params);
+        });
+
+        return newState;
       });
     },
     [setState, updateUrl]

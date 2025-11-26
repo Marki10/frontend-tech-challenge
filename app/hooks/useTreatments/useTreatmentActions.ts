@@ -42,6 +42,8 @@ export function useTreatmentActions({ setState }: UseTreatmentActionsProps) {
 
       setState((prev) => {
         previousItems = prev.items;
+        const newUpdatingIds = new Set(prev.updatingStatusIds);
+        newUpdatingIds.add(id);
 
         const updatedItems = prev.items.map((item) =>
           item.id === id ? { ...item, status } : item
@@ -52,6 +54,7 @@ export function useTreatmentActions({ setState }: UseTreatmentActionsProps) {
           items: updatedItems,
           filteredItems: updatedItems,
           paginatedItems: updatedItems,
+          updatingStatusIds: newUpdatingIds,
         };
       });
 
@@ -65,27 +68,49 @@ export function useTreatmentActions({ setState }: UseTreatmentActionsProps) {
         });
 
         if (!response.ok) {
-          setState((prev) => ({
+          setState((prev) => {
+            const newUpdatingIds = new Set(prev.updatingStatusIds);
+            newUpdatingIds.delete(id);
+
+            return {
+              ...prev,
+              items: previousItems,
+              filteredItems: previousItems,
+              paginatedItems: previousItems,
+              updatingStatusIds: newUpdatingIds,
+            };
+          });
+
+          toast.error("Failed to update status", { duration: 3000 });
+          return;
+        }
+
+        setState((prev) => {
+          const newUpdatingIds = new Set(prev.updatingStatusIds);
+          newUpdatingIds.delete(id);
+
+          return {
+            ...prev,
+            updatingStatusIds: newUpdatingIds,
+          };
+        });
+
+        toast.success("Status updated", { duration: 3000 });
+      } catch {
+        setState((prev) => {
+          const newUpdatingIds = new Set(prev.updatingStatusIds);
+          newUpdatingIds.delete(id);
+
+          return {
             ...prev,
             items: previousItems,
             filteredItems: previousItems,
             paginatedItems: previousItems,
-          }));
+            updatingStatusIds: newUpdatingIds,
+          };
+        });
 
-          toast.error("Failed to update status");
-          return;
-        }
-
-        toast.success("Status updated");
-      } catch {
-        setState((prev) => ({
-          ...prev,
-          items: previousItems,
-          filteredItems: previousItems,
-          paginatedItems: previousItems,
-        }));
-
-        toast.error("Failed to update status");
+        toast.error("Failed to update status", { duration: 3000 });
       }
     },
     [setState]

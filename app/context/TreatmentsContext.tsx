@@ -21,6 +21,7 @@ interface TreatmentsContextType {
     total: number;
     totalPages: number;
   };
+  updatingStatusIds: Set<number>;
 
   handleAddTreatment: (
     data: Omit<Treatment, "id" | "createdAt" | "updatedAt">

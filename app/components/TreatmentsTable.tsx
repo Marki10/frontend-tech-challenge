@@ -9,6 +9,7 @@ export function TreatmentsTable({
   total,
   filteredCount,
   onUpdateStatus,
+  updatingStatusIds,
 }: TreatmentsTableProps) {
   const t = useTranslations();
   if (isLoading) {
@@ -54,6 +55,7 @@ export function TreatmentsTable({
             key={treatment.id || index}
             treatment={treatment}
             onUpdateStatus={onUpdateStatus}
+            isUpdating={updatingStatusIds?.has(treatment.id) ?? false}
           />
         ))}
       </div>
