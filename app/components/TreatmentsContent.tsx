@@ -17,6 +17,7 @@ interface TreatmentsContentProps {
   onSort?: (field: string) => void;
   onUpdateStatus?: (id: number, status: TreatmentStatus) => void;
   updatingStatusIds: Set<number>;
+  clearFilters: () => void;
 }
 
 export function TreatmentsContent({
@@ -31,6 +32,7 @@ export function TreatmentsContent({
   onSort,
   onUpdateStatus,
   updatingStatusIds,
+  clearFilters,
 }: TreatmentsContentProps) {
   const t = useTranslations();
 
@@ -52,7 +54,7 @@ export function TreatmentsContent({
   if (filteredTreatments.length === 0) {
     return (
       <EmptyState>
-        <Button variant="outline" onClick={() => window.location.reload()}>
+        <Button variant="outline" onClick={clearFilters}>
           {t("treatments-clear-filters")}
         </Button>
       </EmptyState>

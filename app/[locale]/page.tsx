@@ -27,6 +27,8 @@ function TreatmentsPageContent() {
     setStatus,
     setCurrentPage,
     handleSort,
+    retry,
+    clearFilters,
   } = useTreatmentsContext();
 
   const t = useTranslations();
@@ -34,7 +36,7 @@ function TreatmentsPageContent() {
   if (error) {
     return (
       <div className="container mx-auto flex flex-col gap-6 px-2.5 py-10">
-        <ErrorState error={error} onRetry={() => window.location.reload()} />
+        <ErrorState error={error} onRetry={retry} />
       </div>
     );
   }
@@ -71,6 +73,7 @@ function TreatmentsPageContent() {
             onSort={handleSort}
             onUpdateStatus={updateTreatmentStatus}
             updatingStatusIds={updatingStatusIds}
+            clearFilters={clearFilters}
           />
         </main>
       </div>

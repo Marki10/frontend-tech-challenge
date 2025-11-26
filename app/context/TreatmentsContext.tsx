@@ -31,6 +31,8 @@ interface TreatmentsContextType {
   setStatus: (status: TreatmentStatus[] | "all") => void;
   setCurrentPage: (page: number) => void;
   handleSort: (field: string) => void;
+  retry: () => void;
+  clearFilters: () => void;
 }
 
 const TreatmentsContext = createContext<TreatmentsContextType | undefined>(

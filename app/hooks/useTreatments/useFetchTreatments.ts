@@ -8,6 +8,8 @@ interface UseFetchTreatmentsProps {
   sort: SortConfig;
   pagination: PaginationParams & { total: number; totalPages: number };
   setState: React.Dispatch<React.SetStateAction<TreatmentsStateType>>;
+  retryKey?: number;
+  onCacheClear?: (clearFn: (queryString: string) => void) => void;
 }
 
 export function useFetchTreatments({
@@ -15,13 +17,25 @@ export function useFetchTreatments({
   sort,
   pagination,
   setState,
+  retryKey,
+  onCacheClear,
 }: UseFetchTreatmentsProps) {
   const abortControllerRef = useRef<AbortController | null>(null);
   const cacheRef = useRef<Map<string, CacheEntry>>(new Map());
+  const clearCacheFnRef = useRef<((queryString: string) => void) | null>(null);
+
+  useEffect(() => {
+    if (onCacheClear) {
+      clearCacheFnRef.current = (queryString: string) => {
+        cacheRef.current.delete(queryString);
+      };
+      onCacheClear(clearCacheFnRef.current);
+    }
+  }, [onCacheClear]);
 
   useEffect(() => {
     const fetchTreatments = async () => {
-      setState((prev) => ({ ...prev, isLoading: true }));
+      setState((prev) => ({ ...prev, isLoading: true, error: null }));
 
       try {
         const params = new URLSearchParams();
@@ -113,6 +127,6 @@ export function useFetchTreatments({
     };
 
     fetchTreatments();
-  }, [filters, sort, pagination.page, pagination.pageSize, pagination.totalPages, setState]);
+  }, [filters, sort, pagination.page, pagination.pageSize, pagination.totalPages, setState, retryKey]);
 }
 
