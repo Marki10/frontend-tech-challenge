@@ -1,3 +1,4 @@
+/// <reference types="@testing-library/jest-dom" />
 import { render, screen, fireEvent } from "@testing-library/react";
 import { ThemeToggle } from "../ThemeToggle";
 

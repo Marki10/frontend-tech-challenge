@@ -17,7 +17,7 @@ export const initialState: Omit<TreatmentsState, "pagination"> & {
   error: null,
   filters: {
     search: "",
-    status: "all",
+    status: [],
   },
   sort: {
     field: "date",
@@ -30,4 +30,6 @@ export const initialState: Omit<TreatmentsState, "pagination"> & {
     totalPages: 0,
   },
 };
+
+export type TreatmentsStateType = typeof initialState;
 

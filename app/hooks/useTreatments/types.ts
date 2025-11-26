@@ -8,3 +8,5 @@ export type CacheEntry = {
   totalPages: number;
 };
 
+export type { TreatmentsStateType } from "./constants";
+

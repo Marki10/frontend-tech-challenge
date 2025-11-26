@@ -1,13 +1,13 @@
 import { useEffect, useRef } from "react";
 import type { Treatment, SortConfig, FilterParams, PaginationParams } from "@/lib/types";
 import { fetchTreatmentsApi } from "@/lib/treatmentsApi";
-import type { CacheEntry } from "./types";
+import type { CacheEntry, TreatmentsStateType } from "./types";
 
 interface UseFetchTreatmentsProps {
   filters: FilterParams;
   sort: SortConfig;
   pagination: PaginationParams & { total: number; totalPages: number };
-  setState: React.Dispatch<React.SetStateAction<any>>;
+  setState: React.Dispatch<React.SetStateAction<TreatmentsStateType>>;
 }
 
 export function useFetchTreatments({
@@ -21,7 +21,7 @@ export function useFetchTreatments({
 
   useEffect(() => {
     const fetchTreatments = async () => {
-      setState((prev: any) => ({ ...prev, isLoading: true }));
+      setState((prev) => ({ ...prev, isLoading: true }));
 
       try {
         const params = new URLSearchParams();
@@ -41,7 +41,7 @@ export function useFetchTreatments({
 
         const cached = cacheRef.current.get(queryString);
         if (cached) {
-          setState((prev: any) => ({
+          setState((prev) => ({
             ...prev,
             items: cached.items,
             filteredItems: cached.items,
@@ -90,7 +90,7 @@ export function useFetchTreatments({
           ...nextPagination,
         });
 
-        setState((prev: any) => ({
+        setState((prev) => ({
           ...prev,
           items,
           filteredItems: items,
@@ -108,7 +108,7 @@ export function useFetchTreatments({
 
         const error =
           err instanceof Error ? err : new Error("Failed to load treatments");
-        setState((prev: any) => ({ ...prev, error, isLoading: false }));
+        setState((prev) => ({ ...prev, error, isLoading: false }));
       }
     };
 

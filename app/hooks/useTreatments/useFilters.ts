@@ -1,11 +1,12 @@
 import { useCallback } from "react";
 import { startTransition } from "react";
 import { usePathname, useRouter } from "@/routing";
-import type { TreatmentStatus, SortConfig, Treatment } from "@/lib/types";
+import type { TreatmentStatus, Treatment } from "@/lib/types";
+import type { TreatmentsStateType } from "./types";
 
 interface UseFiltersProps {
-  state: any;
-  setState: React.Dispatch<React.SetStateAction<any>>;
+  state: TreatmentsStateType;
+  setState: React.Dispatch<React.SetStateAction<TreatmentsStateType>>;
 }
 
 export function useFilters({ state, setState }: UseFiltersProps) {
@@ -23,7 +24,7 @@ export function useFilters({ state, setState }: UseFiltersProps) {
 
   const setSearch = useCallback(
     (search: string) => {
-      setState((prev: any) => {
+      setState((prev) => {
         startTransition(() => {
           const params = new URLSearchParams();
           if (search?.trim()) {
@@ -52,7 +53,7 @@ export function useFilters({ state, setState }: UseFiltersProps) {
 
   const setStatus = useCallback(
     (status: TreatmentStatus[] | "all") => {
-      setState((prev: any) => {
+      setState((prev) => {
         startTransition(() => {
           const params = new URLSearchParams();
           if (prev.filters.search?.trim()) {
@@ -78,7 +79,7 @@ export function useFilters({ state, setState }: UseFiltersProps) {
 
   const setCurrentPage = useCallback(
     (page: number) => {
-      setState((prev: any) => {
+      setState((prev) => {
         startTransition(() => {
           const params = new URLSearchParams();
           if (prev.filters.search?.trim()) {
@@ -103,7 +104,7 @@ export function useFilters({ state, setState }: UseFiltersProps) {
 
   const handleSort = useCallback(
     (field: string) => {
-      setState((prev: any) => ({
+      setState((prev) => ({
         ...prev,
         sort: {
           field: field as keyof Omit<

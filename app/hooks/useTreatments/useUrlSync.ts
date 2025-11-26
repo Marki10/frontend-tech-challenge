@@ -1,9 +1,10 @@
 import { useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import type { TreatmentStatus } from "@/lib/types";
+import type { TreatmentsStateType } from "./types";
 
 interface UseUrlSyncProps {
-  setState: React.Dispatch<React.SetStateAction<any>>;
+  setState: React.Dispatch<React.SetStateAction<TreatmentsStateType>>;
 }
 
 export function useUrlSync({ setState }: UseUrlSyncProps) {
@@ -23,7 +24,7 @@ export function useUrlSync({ setState }: UseUrlSyncProps) {
     
     const urlPage = Number.parseInt(searchParams.get("page") || "1", 10);
 
-    setState((prev: any) => {
+    setState((prev) => {
       return {
         ...prev,
         filters: {

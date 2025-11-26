@@ -28,10 +28,10 @@ export function useDebounce<T>(value: T, delay: number = 300): T {
  * @param delay - Delay in milliseconds (default: 300)
  * @returns A debounced version of the callback
  */
-export function useDebouncedCallback<T extends (...args: any[]) => any>(
-  callback: T,
+export function useDebouncedCallback<TArgs extends unknown[], TReturn>(
+  callback: (...args: TArgs) => TReturn,
   delay: number = 300
-): T {
+): (...args: TArgs) => void {
   const callbackRef = useRef(callback);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -39,7 +39,7 @@ export function useDebouncedCallback<T extends (...args: any[]) => any>(
     callbackRef.current = callback;
   }, [callback]);
 
-  const debouncedCallback = ((...args: Parameters<T>) => {
+  const debouncedCallback = (...args: TArgs) => {
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current);
     }
@@ -47,7 +47,7 @@ export function useDebouncedCallback<T extends (...args: any[]) => any>(
     timeoutRef.current = setTimeout(() => {
       callbackRef.current(...args);
     }, delay);
-  }) as T;
+  };
 
   useEffect(() => {
     return () => {

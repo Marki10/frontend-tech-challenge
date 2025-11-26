@@ -2,9 +2,10 @@ import { useCallback } from "react";
 import { toast } from "sonner";
 import type { Treatment, TreatmentStatus } from "@/lib/types";
 import { CreateTreatmentRequest } from "@/lib/api.types";
+import type { TreatmentsStateType } from "./types";
 
 interface UseTreatmentActionsProps {
-  setState: React.Dispatch<React.SetStateAction<any>>;
+  setState: React.Dispatch<React.SetStateAction<TreatmentsStateType>>;
 }
 
 export function useTreatmentActions({ setState }: UseTreatmentActionsProps) {
@@ -19,7 +20,7 @@ export function useTreatmentActions({ setState }: UseTreatmentActionsProps) {
           updatedAt: new Date().toISOString(),
         };
 
-        setState((prev: any) => ({
+        setState((prev) => ({
           ...prev,
           items: [newTreatment, ...prev.items],
         }));
@@ -28,7 +29,7 @@ export function useTreatmentActions({ setState }: UseTreatmentActionsProps) {
       } catch (err) {
         const error =
           err instanceof Error ? err : new Error("Failed to add treatment");
-        setState((prev: any) => ({ ...prev, error }));
+        setState((prev) => ({ ...prev, error }));
         return false;
       }
     },
@@ -39,10 +40,10 @@ export function useTreatmentActions({ setState }: UseTreatmentActionsProps) {
     async (id: number, status: TreatmentStatus) => {
       let previousItems: Treatment[] = [];
 
-      setState((prev: any) => {
+      setState((prev) => {
         previousItems = prev.items;
 
-        const updatedItems = prev.items.map((item: Treatment) =>
+        const updatedItems = prev.items.map((item) =>
           item.id === id ? { ...item, status } : item
         );
 
@@ -64,7 +65,7 @@ export function useTreatmentActions({ setState }: UseTreatmentActionsProps) {
         });
 
         if (!response.ok) {
-          setState((prev: any) => ({
+          setState((prev) => ({
             ...prev,
             items: previousItems,
             filteredItems: previousItems,
@@ -77,7 +78,7 @@ export function useTreatmentActions({ setState }: UseTreatmentActionsProps) {
 
         toast.success("Status updated");
       } catch {
-        setState((prev: any) => ({
+        setState((prev) => ({
           ...prev,
           items: previousItems,
           filteredItems: previousItems,
