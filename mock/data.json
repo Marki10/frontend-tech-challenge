@@ -116,7 +116,7 @@
       "procedure": "Gum Contouring",
       "dentist": "Dr. Hart",
       "date": "2025-03-01",
-      "status": "scheduled",
+      "status": "in_progress",
       "notes": "Discuss sedation options.",
       "cost": 450
     },
@@ -399,6 +399,15 @@
       "status": "in_progress",
       "notes": "Performing weekly adjustments.",
       "cost": 520
+    },
+    {
+      "id": 41,
+      "patient": "Test",
+      "procedure": "asd",
+      "dentist": "dsa",
+      "date": "2025-11-13",
+      "status": "scheduled",
+      "notes": "New treatment"
     }
   ]
 }

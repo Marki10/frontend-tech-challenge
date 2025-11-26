@@ -29,56 +29,72 @@ function parsePositiveInteger(value: string | null, fallback: number) {
 }
 
 export async function GET(request: Request) {
-  return withSimulate(
-    async () => {
-      const treatments = await getTreatments();
+  try {
+    return await withSimulate(
+      async () => {
+        const treatments = await getTreatments();
 
-      const { searchParams } = new URL(request.url);
+        const { searchParams } = new URL(request.url);
 
-      const search = (searchParams.get("search") || "").trim().toLowerCase();
-      const page = parsePositiveInteger(searchParams.get("page"), DEFAULT_PAGE);
-      const pageSize = Math.min(
-        parsePositiveInteger(searchParams.get("pageSize"), DEFAULT_PAGE_SIZE),
-        MAX_PAGE_SIZE
-      );
-      const status = searchParams.get("status") as TreatmentStatus | "all";
-      const filteredByStatus =
-        status && status !== "all"
-          ? treatments.filter((item) => item.status === status)
-          : treatments;
-
-      const filtered = search
-        ? filteredByStatus.filter((item) => {
-            const patient = item.patient.toLowerCase();
-            const procedure = item.procedure.toLowerCase();
-            const dentist = item.dentist.toLowerCase();
-
-            return (
-              patient.includes(search) ||
-              procedure.includes(search) ||
-              dentist.includes(search)
+        const search = (searchParams.get("search") || "").trim().toLowerCase();
+        const page = parsePositiveInteger(searchParams.get("page"), DEFAULT_PAGE);
+        const pageSize = Math.min(
+          parsePositiveInteger(searchParams.get("pageSize"), DEFAULT_PAGE_SIZE),
+          MAX_PAGE_SIZE
+        );
+        const statusParam = searchParams.get("status");
+        let filteredByStatus = treatments;
+        
+        if (statusParam && statusParam !== "all") {
+          const statusArray = statusParam.split(",").filter(Boolean) as TreatmentStatus[];
+          if (statusArray.length > 0) {
+            filteredByStatus = treatments.filter((item) => 
+              item.status && statusArray.includes(item.status)
             );
-          })
-        : filteredByStatus;
+          }
+        }
 
-      const total = filtered.length;
-      const totalPages = Math.ceil(total / pageSize);
-      const start = (page - 1) * pageSize;
-      const end = start + pageSize;
-      const data = filtered.slice(start, end);
+        const filtered = search
+          ? filteredByStatus.filter((item) => {
+              const patient = (item.patient || "").toLowerCase();
+              const procedure = (item.procedure || "").toLowerCase();
+              const dentist = (item.dentist || "").toLowerCase();
 
-      return NextResponse.json({
-        data,
-        total,
-        page,
-        pageSize,
-        totalPages,
-      });
-    },
-    {
-      allowFailure: true,
-    }
-  );
+              return (
+                patient.includes(search) ||
+                procedure.includes(search) ||
+                dentist.includes(search)
+              );
+            })
+          : filteredByStatus;
+
+        const total = filtered.length;
+        const totalPages = Math.ceil(total / pageSize);
+        const start = (page - 1) * pageSize;
+        const end = start + pageSize;
+        const data = filtered.slice(start, end);
+
+        return NextResponse.json({
+          data,
+          total,
+          page,
+          pageSize,
+          totalPages,
+        });
+      },
+      {
+        allowFailure: true,
+      }
+    );
+  } catch (error) {
+    console.error("Error fetching treatments:", error);
+    return NextResponse.json(
+      {
+        message: error instanceof Error ? error.message : "Failed to fetch treatments",
+      },
+      { status: 500 }
+    );
+  }
 }
 
 export async function POST(request: Request) {
