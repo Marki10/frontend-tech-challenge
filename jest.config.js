@@ -12,6 +12,9 @@ const customJestConfig = {
     "^@/(.*)$": "<rootDir>/$1",
   },
   testPathIgnorePatterns: ["<rootDir>/node_modules/", "<rootDir>/.next/"],
+  transformIgnorePatterns: [
+    "node_modules/(?!(next-intl|use-intl|@formatjs)/)",
+  ],
 };
 
 module.exports = createJestConfig(customJestConfig);

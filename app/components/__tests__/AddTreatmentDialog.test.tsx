@@ -11,6 +11,28 @@ jest.mock("next/navigation", () => ({
   }),
 }));
 
+jest.mock("next-intl", () => ({
+  useTranslations: () => (key: string) => {
+    const translations: Record<string, string> = {
+      "treatments-add-dialog-title": "Add treatment",
+      "form-patient": "Patient",
+      "form-procedure": "Procedure",
+      "form-dentist": "Dentist",
+      "form-date": "Date",
+      "form-notes": "Notes",
+      "form-save-treatment": "Save treatment",
+      "form-saving": "Saving...",
+      "validation-patient-required": "Patient is required",
+      "validation-procedure-required": "Procedure is required",
+      "validation-dentist-required": "Dentist is required",
+      "validation-date-required": "Date is required",
+      "errors-failed-to-save": "Failed to save treatment",
+      "success-treatment-added": "Treatment added successfully",
+    };
+    return translations[key] || key;
+  },
+}));
+
 describe("AddTreatmentDialog", () => {
   const mockOnSubmit = jest.fn().mockResolvedValue(true);
 
