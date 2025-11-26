@@ -1,5 +1,6 @@
 import { z } from "zod";
 import type { Treatment } from "./types";
+import type { CreateTreatmentRequest } from "./api.types";
 
 const treatmentsResponseSchema = z.object({
   data: z
@@ -64,4 +65,41 @@ export async function fetchTreatmentsApi(
     total: data.total ?? rawItems.length,
     totalPages: data.totalPages ?? 0,
   };
+}
+
+export interface CreateTreatmentApiResult {
+  success: boolean;
+  error?: string;
+  treatment?: Treatment;
+}
+
+export async function createTreatmentApi(
+  data: CreateTreatmentRequest
+): Promise<CreateTreatmentApiResult> {
+  try {
+    const response = await fetch("/api/treatments", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    });
+
+    if (response.status === 422) {
+      const errorData = await response.json().catch(() => null);
+      const message =
+        (errorData && typeof errorData.message === "string" && errorData.message) ||
+        "Validation error";
+      return { success: false, error: message };
+    }
+
+    if (!response.ok) {
+      return { success: false, error: "Failed to save treatment" };
+    }
+
+    const treatment = await response.json().catch(() => null);
+    return { success: true, treatment };
+  } catch {
+    return { success: false, error: "Failed to save treatment" };
+  }
 }

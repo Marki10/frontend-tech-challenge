@@ -1,6 +1,6 @@
 "use client";
 
-import * as React from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -10,21 +10,12 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { toast } from "sonner";
+import { Form } from "@/components/ui/form";
+import { FormTextField } from "./forms/FormTextField";
+import { FormDateField } from "./forms/FormDateField";
+import { FormTextareaField } from "./forms/FormTextareaField";
 import { useTranslations } from "next-intl";
+import { useAddTreatmentForm } from "@/app/hooks/useAddTreatmentForm";
 
 interface AddTreatmentDialogProps {
   children: React.ReactNode;
@@ -41,78 +32,12 @@ export function AddTreatmentDialog({
   children,
   onSubmit,
 }: AddTreatmentDialogProps) {
-  const [open, setOpen] = React.useState(false);
-  const [serverError, setServerError] = React.useState<string | null>(null);
+  const [open, setOpen] = useState(false);
   const t = useTranslations();
 
-  const addTreatmentSchema = z.object({
-    patient: z.string().min(1, t("validation-patient-required")),
-    procedure: z.string().min(1, t("validation-procedure-required")),
-    dentist: z.string().min(1, t("validation-dentist-required")),
-    date: z.string().min(1, t("validation-date-required")),
-    notes: z.string().optional(),
-  });
-
-  type AddTreatmentFormValues = z.infer<typeof addTreatmentSchema>;
-
-  const form = useForm<AddTreatmentFormValues>({
-    resolver: zodResolver(addTreatmentSchema),
-    defaultValues: {
-      patient: "",
-      procedure: "",
-      dentist: "",
-      date: "",
-      notes: "",
-    },
-  });
-
-  const isSubmitting = form.formState.isSubmitting;
-
-  const handleSubmit = form.handleSubmit(async (values) => {
-    setServerError(null);
-
-    try {
-      const response = await fetch("/api/treatments", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(values),
-      });
-
-      if (response.status === 422) {
-        const data = await response.json().catch(() => null as unknown);
-        const message =
-          (data && typeof data.message === "string" && data.message) ||
-          t("errors-validation");
-        setServerError(message);
-        toast.error(message);
-        return;
-      }
-
-      if (!response.ok) {
-        setServerError(t("errors-failed-to-save"));
-        toast.error(t("errors-failed-to-save"));
-        return;
-      }
-
-      await response.json().catch(() => null as unknown);
-
-      await onSubmit({
-        patient: values.patient,
-        procedure: values.procedure,
-        dentist: values.dentist,
-        date: values.date,
-        notes: values.notes ?? "",
-      });
-
-      toast.success(t("success-treatment-added"));
-      setOpen(false);
-      form.reset();
-    } catch {
-      setServerError(t("errors-failed-to-save"));
-      toast.error(t("errors-failed-to-save"));
-    }
+  const { form, handleSubmit, serverError, isSubmitting } = useAddTreatmentForm({
+    onSuccess: onSubmit,
+    onSuccessCallback: () => setOpen(false),
   });
 
   return (
@@ -126,86 +51,38 @@ export function AddTreatmentDialog({
             </DialogHeader>
 
             <div className="space-y-4 py-4">
-              <FormField
+              <FormTextField
                 control={form.control}
                 name="patient"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t("form-patient")}</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder={t("placeholders-patient")}
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
+                label={t("form-patient")}
+                placeholder={t("placeholders-patient")}
               />
 
-              <FormField
+              <FormTextField
                 control={form.control}
                 name="procedure"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t("form-procedure")}</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder={t("placeholders-procedure")}
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
+                label={t("form-procedure")}
+                placeholder={t("placeholders-procedure")}
               />
 
-              <FormField
+              <FormTextField
                 control={form.control}
                 name="dentist"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t("form-dentist")}</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder={t("placeholders-dentist")}
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
+                label={t("form-dentist")}
+                placeholder={t("placeholders-dentist")}
               />
 
-              <FormField
+              <FormDateField
                 control={form.control}
                 name="date"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t("form-date")}</FormLabel>
-                    <FormControl>
-                      <Input type="date" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
+                label={t("form-date")}
               />
 
-              <FormField
+              <FormTextareaField
                 control={form.control}
                 name="notes"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t("form-notes")}</FormLabel>
-                    <FormControl>
-                      <Textarea
-                        placeholder={t("placeholders-notes")}
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
+                label={t("form-notes")}
+                placeholder={t("placeholders-notes")}
               />
 
               {serverError && (

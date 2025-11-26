@@ -16,4 +16,3 @@ export function CountryFlag({ countryCode, className }: CountryFlagProps) {
     />
   );
 }
-
