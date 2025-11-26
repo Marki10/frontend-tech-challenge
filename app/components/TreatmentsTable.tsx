@@ -50,9 +50,9 @@ export function TreatmentsTable({
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4" role="list" aria-label={t("treatments-title")}>
-        {treatments.map((treatment, index) => (
+        {treatments.map((treatment) => (
           <TreatmentRow
-            key={treatment.id || index}
+            key={treatment.id}
             treatment={treatment}
             onUpdateStatus={onUpdateStatus}
             isUpdating={updatingStatusIds?.has(treatment.id) ?? false}

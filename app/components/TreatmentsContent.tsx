@@ -2,7 +2,7 @@ import { TreatmentsTable } from "./TreatmentsTable";
 import { EmptyState } from "./EmptyState";
 import { PaginationControls } from "./PaginationControls";
 import { Button } from "@/components/ui/button";
-import type { Treatment, TreatmentStatus, SortConfig } from "@/lib/types";
+import type { Treatment, TreatmentStatus } from "@/lib/types";
 import { useTranslations } from "next-intl";
 
 interface TreatmentsContentProps {
@@ -13,8 +13,6 @@ interface TreatmentsContentProps {
   currentPage: number;
   totalPages: number;
   onPageChange: (page: number) => void;
-  sortConfig?: SortConfig;
-  onSort?: (field: string) => void;
   onUpdateStatus?: (id: number, status: TreatmentStatus) => void;
   updatingStatusIds: Set<number>;
   clearFilters: () => void;
@@ -28,8 +26,6 @@ export function TreatmentsContent({
   currentPage,
   totalPages,
   onPageChange,
-  sortConfig,
-  onSort,
   onUpdateStatus,
   updatingStatusIds,
   clearFilters,
@@ -43,8 +39,6 @@ export function TreatmentsContent({
         isLoading={true}
         total={0}
         filteredCount={0}
-        sortConfig={sortConfig}
-        onSort={onSort}
         onUpdateStatus={onUpdateStatus}
         updatingStatusIds={updatingStatusIds}
       />
@@ -68,8 +62,6 @@ export function TreatmentsContent({
         isLoading={isLoading}
         total={total}
         filteredCount={filteredTreatments.length}
-        sortConfig={sortConfig}
-        onSort={onSort}
         onUpdateStatus={onUpdateStatus}
         updatingStatusIds={updatingStatusIds}
       />

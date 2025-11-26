@@ -1,4 +1,4 @@
-import { Treatment, TreatmentStatus, SortConfig } from "./types";
+import { Treatment, TreatmentStatus } from "./types";
 import { ReactNode } from "react";
 import type { ApiError } from "./errors";
 
@@ -7,9 +7,6 @@ export interface TreatmentsTableProps {
   isLoading: boolean;
   total: number;
   filteredCount: number;
-  sortConfig?: SortConfig;
-  onSort?: (field: string) => void;
-  className?: string;
   onUpdateStatus?: (id: number, status: TreatmentStatus) => void;
   updatingStatusIds?: Set<number>;
 }
@@ -49,7 +46,7 @@ export interface PaginationControlsProps {
 export interface EmptyStateProps {
   title?: string;
   description?: string;
-  action?: ReactNode;
+  children?: ReactNode;
   className?: string;
 }
 

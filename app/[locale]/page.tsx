@@ -18,7 +18,6 @@ function TreatmentsPageContent() {
     isLoading,
     error,
     filters,
-    sort,
     pagination,
     updatingStatusIds,
     handleAddTreatment,
@@ -26,7 +25,6 @@ function TreatmentsPageContent() {
     setSearch,
     setStatus,
     setCurrentPage,
-    handleSort,
     retry,
     clearFilters,
   } = useTreatmentsContext();
@@ -69,8 +67,6 @@ function TreatmentsPageContent() {
             currentPage={pagination.page}
             totalPages={pagination.totalPages}
             onPageChange={setCurrentPage}
-            sortConfig={sort}
-            onSort={handleSort}
             onUpdateStatus={updateTreatmentStatus}
             updatingStatusIds={updatingStatusIds}
             clearFilters={clearFilters}
