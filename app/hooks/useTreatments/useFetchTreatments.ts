@@ -121,7 +121,9 @@ export function useFetchTreatments({
         }
 
         const error =
-          err instanceof Error ? err : new Error("Failed to load treatments");
+          err instanceof Error
+            ? err
+            : new Error("Failed to load treatments");
         setState((prev) => ({ ...prev, error, isLoading: false }));
       }
     };

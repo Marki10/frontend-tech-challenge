@@ -41,12 +41,14 @@ export interface FilterParams {
   dateTo?: string;
 }
 
+import type { ApiError } from "./errors";
+
 export interface TreatmentsState {
   items: Treatment[];
   filteredItems: Treatment[];
   paginatedItems: Treatment[];
   isLoading: boolean;
-  error: Error | null;
+  error: Error | ApiError | null;
   filters: FilterParams;
   sort: SortConfig;
   pagination: PaginationParams & {

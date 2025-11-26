@@ -2,6 +2,7 @@ import { AlertCircle, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { ErrorStateProps } from "@/lib/component.types";
 import { useTranslations } from "next-intl";
+import { ApiError } from "@/lib/errors";
 
 export function ErrorState({
   error,
@@ -10,8 +11,47 @@ export function ErrorState({
 }: ErrorStateProps) {
   const t = useTranslations();
 
+  const getErrorMessage = () => {
+    if (!error) {
+      return t("error-description");
+    }
+
+    if (error instanceof ApiError) {
+      if (error.errorType === "network") {
+        return t("error-network");
+      }
+
+      if (error.statusCode) {
+        switch (error.statusCode) {
+          case 404:
+            return t("error-not-found");
+          case 400:
+            return t("error-bad-request");
+          case 500:
+          case 502:
+          case 503:
+          case 504:
+            return t("error-server");
+          default:
+            if (error.statusCode >= 500) {
+              return t("error-server");
+            }
+            if (error.statusCode >= 400) {
+              return t("error-bad-request");
+            }
+        }
+      }
+
+      if (error.errorType === "server") {
+        return t("error-server");
+      }
+    }
+
+    return error.message || t("error-description");
+  };
+
   const title = t("error-title");
-  const description = error?.message || t("error-description");
+  const description = getErrorMessage();
 
   return (
     <div

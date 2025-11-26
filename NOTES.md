@@ -153,6 +153,5 @@ This project is built with Next.js, TypeScript, and Tailwind CSS. The implementa
 
 ## What I would improve next
 
-- **Better error messaging**: Surface specific error messages (404/500) while remaining user-friendly.
 - **More granular loading states**: Track loading per action type for better UX feedback.
 - **Form enhancements**: Add optional `status` and `cost` fields with proper validation and formatting.

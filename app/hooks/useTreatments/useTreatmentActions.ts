@@ -1,5 +1,6 @@
 import { useCallback } from "react";
 import { toast } from "sonner";
+import { useTranslations } from "next-intl";
 import type { Treatment, TreatmentStatus } from "@/lib/types";
 import { CreateTreatmentRequest } from "@/lib/api.types";
 import type { TreatmentsStateType } from "./types";
@@ -9,6 +10,7 @@ interface UseTreatmentActionsProps {
 }
 
 export function useTreatmentActions({ setState }: UseTreatmentActionsProps) {
+  const t = useTranslations();
   const handleAddTreatment = useCallback(
     async (data: CreateTreatmentRequest) => {
       try {
@@ -81,7 +83,14 @@ export function useTreatmentActions({ setState }: UseTreatmentActionsProps) {
             };
           });
 
-          toast.error("Failed to update status", { duration: 3000 });
+          let errorMessage = t("error-update-status");
+          if (response.status === 404) {
+            errorMessage = t("error-update-status-404");
+          } else if (response.status >= 500) {
+            errorMessage = t("error-update-status-500");
+          }
+
+          toast.error(errorMessage, { duration: 3000 });
           return;
         }
 
@@ -96,7 +105,7 @@ export function useTreatmentActions({ setState }: UseTreatmentActionsProps) {
         });
 
         toast.success("Status updated", { duration: 3000 });
-      } catch {
+      } catch (error) {
         setState((prev) => {
           const newUpdatingIds = new Set(prev.updatingStatusIds);
           newUpdatingIds.delete(id);
@@ -110,10 +119,15 @@ export function useTreatmentActions({ setState }: UseTreatmentActionsProps) {
           };
         });
 
-        toast.error("Failed to update status", { duration: 3000 });
+        const errorMessage =
+          error instanceof TypeError && error.message.includes("fetch")
+            ? t("error-network")
+            : t("error-update-status");
+
+        toast.error(errorMessage, { duration: 3000 });
       }
     },
-    [setState]
+    [setState, t]
   );
 
   return {

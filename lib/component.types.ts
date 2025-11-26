@@ -1,5 +1,6 @@
 import { Treatment, TreatmentStatus, SortConfig } from "./types";
 import { ReactNode } from "react";
+import type { ApiError } from "./errors";
 
 export interface TreatmentsTableProps {
   treatments: Treatment[];
@@ -53,7 +54,7 @@ export interface EmptyStateProps {
 }
 
 export interface ErrorStateProps {
-  error: Error | null;
+  error: Error | ApiError | null;
   onRetry?: () => void;
   className?: string;
 }

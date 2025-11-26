@@ -1,6 +1,7 @@
 import { z } from "zod";
 import type { Treatment } from "./types";
 import type { CreateTreatmentRequest } from "./api.types";
+import { ApiError } from "./errors";
 
 const treatmentsResponseSchema = z.object({
   data: z
@@ -41,30 +42,48 @@ export async function fetchTreatmentsApi(
   fallbackPageSize: number,
   signal?: AbortSignal
 ): Promise<TreatmentsApiResult> {
-  const response = await fetch(`/api/treatments?${queryString}`, { signal });
+  try {
+    const response = await fetch(`/api/treatments?${queryString}`, { signal });
 
-  if (!response.ok) {
-    throw new Error("Failed to load treatments");
-  }
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => null);
+      const message =
+        (errorData && typeof errorData.message === "string" && errorData.message) ||
+        undefined;
+      throw ApiError.fromResponse(response, message);
+    }
 
-  const text = await response.text();
-  const json = text ? JSON.parse(text) : {};
-  const parsed = treatmentsResponseSchema.safeParse(json);
+    const text = await response.text();
+    const json = text ? JSON.parse(text) : {};
+    const parsed = treatmentsResponseSchema.safeParse(json);
 
-  if (!parsed.success) {
-    throw new Error("Invalid treatments response");
-  }
+    if (!parsed.success) {
+      throw new ApiError("Invalid treatments response", undefined, "unknown");
+    }
 
   const data = parsed.data;
   const rawItems = Array.isArray(data.data) ? data.data : [];
 
-  return {
-    items: rawItems,
-    page: data.page ?? fallbackPage,
-    pageSize: data.pageSize ?? fallbackPageSize,
-    total: data.total ?? rawItems.length,
-    totalPages: data.totalPages ?? 0,
-  };
+    return {
+      items: rawItems,
+      page: data.page ?? fallbackPage,
+      pageSize: data.pageSize ?? fallbackPageSize,
+      total: data.total ?? rawItems.length,
+      totalPages: data.totalPages ?? 0,
+    };
+  } catch (error) {
+    if (error instanceof ApiError) {
+      throw error;
+    }
+    if (error instanceof TypeError && error.message.includes("fetch")) {
+      throw ApiError.fromNetworkError("Network error occurred");
+    }
+    throw new ApiError(
+      error instanceof Error ? error.message : "Unknown error",
+      undefined,
+      "unknown"
+    );
+  }
 }
 
 export interface CreateTreatmentApiResult {
