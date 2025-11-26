@@ -24,8 +24,14 @@ export function useFilters({ state, setState }: UseFiltersProps) {
 
   const setSearch = useCallback(
     (search: string) => {
+      let currentStatus: TreatmentStatus[] | "all" = "all";
+      let currentPageSize = 10;
+
       setState((prev) => {
-        const newState = {
+        currentStatus = prev.filters.status || "all";
+        currentPageSize = prev.pagination.pageSize;
+        
+        return {
           ...prev,
           filters: {
             ...prev.filters,
@@ -33,77 +39,91 @@ export function useFilters({ state, setState }: UseFiltersProps) {
           },
           pagination: { ...prev.pagination, page: 1 },
         };
+      });
 
+      setTimeout(() => {
         startTransition(() => {
           const params = new URLSearchParams();
           if (search?.trim()) {
             params.set("search", search.trim());
           }
-          if (newState.filters.status && newState.filters.status !== "all" && Array.isArray(newState.filters.status) && newState.filters.status.length > 0) {
-            params.set("status", newState.filters.status.join(","));
+          if (currentStatus && currentStatus !== "all" && Array.isArray(currentStatus) && currentStatus.length > 0) {
+            params.set("status", currentStatus.join(","));
           }
           params.set("page", "1");
-          params.set("pageSize", String(newState.pagination.pageSize));
+          params.set("pageSize", String(currentPageSize));
           updateUrl(params);
         });
-
-        return newState;
-      });
+      }, 0);
     },
     [setState, updateUrl]
   );
 
   const setStatus = useCallback(
     (status: TreatmentStatus[] | "all") => {
+      let currentSearch = "";
+      let currentPageSize = 10;
+
       setState((prev) => {
-        const newState = {
+        currentSearch = prev.filters.search || "";
+        currentPageSize = prev.pagination.pageSize;
+        
+        return {
           ...prev,
           filters: { ...prev.filters, status },
           pagination: { ...prev.pagination, page: 1 },
         };
+      });
 
+      setTimeout(() => {
         startTransition(() => {
           const params = new URLSearchParams();
-          if (newState.filters.search?.trim()) {
-            params.set("search", newState.filters.search.trim());
+          if (currentSearch?.trim()) {
+            params.set("search", currentSearch.trim());
           }
           if (status && status !== "all" && status.length > 0) {
             params.set("status", status.join(","));
           }
           params.set("page", "1");
-          params.set("pageSize", String(newState.pagination.pageSize));
+          params.set("pageSize", String(currentPageSize));
           updateUrl(params);
         });
-
-        return newState;
-      });
+      }, 0);
     },
     [setState, updateUrl]
   );
 
   const setCurrentPage = useCallback(
     (page: number) => {
+      let currentSearch = "";
+      let currentStatus: TreatmentStatus[] | "all" = "all";
+      let currentPageSize = 10;
+
       setState((prev) => {
-        const newState = {
+        currentSearch = prev.filters.search || "";
+        currentStatus = prev.filters.status || "all";
+        currentPageSize = prev.pagination.pageSize;
+        
+        return {
           ...prev,
           pagination: { ...prev.pagination, page },
         };
+      });
 
+      setTimeout(() => {
         startTransition(() => {
           const params = new URLSearchParams();
-          if (newState.filters.search?.trim()) {
-            params.set("search", newState.filters.search.trim());
+          if (currentSearch?.trim()) {
+            params.set("search", currentSearch.trim());
           }
-          if (newState.filters.status && newState.filters.status !== "all" && Array.isArray(newState.filters.status) && newState.filters.status.length > 0) {
-            params.set("status", newState.filters.status.join(","));
+          if (currentStatus && currentStatus !== "all" && Array.isArray(currentStatus) && currentStatus.length > 0) {
+            params.set("status", currentStatus.join(","));
           }
           params.set("page", String(page));
-          params.set("pageSize", String(newState.pagination.pageSize));
+          params.set("pageSize", String(currentPageSize));
           updateUrl(params);
         });
-
-        return newState;
-      });
+      }, 0);
     },
     [setState, updateUrl]
   );
