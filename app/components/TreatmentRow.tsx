@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -27,11 +28,16 @@ interface TreatmentRowProps {
 
 export function TreatmentRow({ treatment, onUpdateStatus }: TreatmentRowProps) {
   const t = useTranslations();
+  const [isDropdownOpen, setIsDropdownOpen] = useState<boolean>(false);
   const status = (treatment.status || "scheduled") as TreatmentStatus;
   const statusConfig = TREATMENT_STATUS_CONFIG[status];
 
   return (
-    <Card className="gap-3 py-3 shadow-sm">
+    <Card
+      className="gap-3 py-3 shadow-sm"
+      role="article"
+      aria-label={t("aria-treatment-card", { patient: treatment.patient })}
+    >
       <CardHeader className="pb-2">
         <CardTitle className="text-base">{treatment.patient}</CardTitle>
         <CardDescription className="text-xs">{treatment.procedure}</CardDescription>
@@ -51,7 +57,10 @@ export function TreatmentRow({ treatment, onUpdateStatus }: TreatmentRowProps) {
           <div className="text-xs text-muted-foreground">
             {t("status-label")}
           </div>
-          <Badge className={`mt-1 ${statusConfig.className}`}>
+          <Badge
+            className={`mt-1 ${statusConfig.className}`}
+            aria-label={t("aria-status-current", { status: statusConfig.label })}
+          >
             {statusConfig.label}
           </Badge>
         </div>
@@ -62,13 +71,19 @@ export function TreatmentRow({ treatment, onUpdateStatus }: TreatmentRowProps) {
         ) : null}
       </CardContent>
       <CardFooter className="pt-3">
-        <DropdownMenu>
+        <DropdownMenu open={isDropdownOpen} onOpenChange={setIsDropdownOpen}>
           <DropdownMenuTrigger asChild>
-            <Button variant="outline" size="sm">
+            <Button
+              variant="outline"
+              size="sm"
+              aria-label={t("aria-update-status-label", { patient: treatment.patient })}
+              aria-haspopup="true"
+              aria-expanded={isDropdownOpen}
+            >
               {t("update-status")}
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent className="w-56">
+          <DropdownMenuContent className="w-56" role="menu">
             <DropdownMenuLabel>{t("filter-by-status")}</DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuCheckboxItem
@@ -76,6 +91,7 @@ export function TreatmentRow({ treatment, onUpdateStatus }: TreatmentRowProps) {
               onCheckedChange={() =>
                 onUpdateStatus?.(treatment.id, "scheduled")
               }
+              role="menuitemcheckbox"
             >
               {t("status-scheduled")}
             </DropdownMenuCheckboxItem>
@@ -84,6 +100,7 @@ export function TreatmentRow({ treatment, onUpdateStatus }: TreatmentRowProps) {
               onCheckedChange={() =>
                 onUpdateStatus?.(treatment.id, "in_progress")
               }
+              role="menuitemcheckbox"
             >
               {t("status-in-progress")}
             </DropdownMenuCheckboxItem>
@@ -92,6 +109,7 @@ export function TreatmentRow({ treatment, onUpdateStatus }: TreatmentRowProps) {
               onCheckedChange={() =>
                 onUpdateStatus?.(treatment.id, "completed")
               }
+              role="menuitemcheckbox"
             >
               {t("status-completed")}
             </DropdownMenuCheckboxItem>

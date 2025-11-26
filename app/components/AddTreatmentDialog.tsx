@@ -16,6 +16,7 @@ import { FormDateField } from "./forms/FormDateField";
 import { FormTextareaField } from "./forms/FormTextareaField";
 import { useTranslations } from "next-intl";
 import { useAddTreatmentForm } from "@/app/hooks/useAddTreatmentForm";
+import { DialogDescription } from "@/components/ui/dialog";
 
 interface AddTreatmentDialogProps {
   children: React.ReactNode;
@@ -43,11 +44,14 @@ export function AddTreatmentDialog({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>{children}</DialogTrigger>
-      <DialogContent>
+      <DialogContent aria-describedby={serverError ? "server-error" : undefined}>
         <Form {...form}>
-          <form onSubmit={handleSubmit}>
+          <form onSubmit={handleSubmit} noValidate>
             <DialogHeader>
               <DialogTitle>{t("treatments-add-dialog-title")}</DialogTitle>
+              <DialogDescription>
+                {t("treatments-subtitle")}
+              </DialogDescription>
             </DialogHeader>
 
             <div className="space-y-4 py-4">
@@ -86,12 +90,23 @@ export function AddTreatmentDialog({
               />
 
               {serverError && (
-                <p className="text-sm text-destructive">{serverError}</p>
+                <p
+                  className="text-sm text-destructive"
+                  role="alert"
+                  aria-live="assertive"
+                  id="server-error"
+                >
+                  {serverError}
+                </p>
               )}
             </div>
 
             <DialogFooter>
-              <Button type="submit" disabled={isSubmitting}>
+              <Button
+                type="submit"
+                disabled={isSubmitting}
+                aria-label={isSubmitting ? t("form-saving") : t("form-save-treatment")}
+              >
                 {isSubmitting ? t("form-saving") : t("form-save-treatment")}
               </Button>
             </DialogFooter>

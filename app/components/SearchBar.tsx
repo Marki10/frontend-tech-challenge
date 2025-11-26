@@ -27,10 +27,13 @@ export function SearchBar({ value, onChange, placeholder, debounceMs = 300 }: Se
 
   return (
     <Input
+      type="search"
       placeholder={defaultPlaceholder}
       value={localValue}
       onChange={(e) => handleChange(e.target.value)}
       className="w-full md:w-[300px]"
+      aria-label={t("aria-search-label")}
+      aria-describedby="search-description"
     />
   );
 }

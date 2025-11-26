@@ -44,5 +44,17 @@
   "validation-patient-required": "Patient ist erforderlich",
   "validation-procedure-required": "Eingriff ist erforderlich",
   "validation-dentist-required": "Zahnarzt ist erforderlich",
-  "validation-date-required": "Datum ist erforderlich"
+  "validation-date-required": "Datum ist erforderlich",
+  "aria-search-label": "Behandlungen suchen",
+  "aria-search-description": "Suche nach Patientennamen, Eingriff oder Zahnarzt",
+  "aria-status-filter-label": "Behandlungen nach Status filtern",
+  "aria-status-selected": "Ausgewählter Status: {status}",
+  "aria-status-count": "{count} Status ausgewählt",
+  "aria-treatment-card": "Behandlung für {patient}",
+  "aria-update-status-label": "Status für {patient} aktualisieren",
+  "aria-status-current": "Aktueller Status: {status}",
+  "aria-loading-treatments": "Behandlungen werden geladen",
+  "aria-treatments-loaded": "{count} Behandlungen geladen",
+  "aria-pagination": "Pagination, Seite {current} von {total}",
+  "aria-skip-to-main": "Zum Hauptinhalt springen"
 }

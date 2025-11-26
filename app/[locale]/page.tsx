@@ -1,6 +1,7 @@
 "use client";
 
 import { Suspense } from "react";
+import { useTranslations } from "next-intl";
 import { Header } from "../components/Header";
 import { FiltersSection } from "../components/FiltersSection";
 import { TreatmentsContent } from "../components/TreatmentsContent";
@@ -27,6 +28,8 @@ function TreatmentsPageContent() {
     handleSort,
   } = useTreatmentsContext();
 
+  const t = useTranslations();
+
   if (error) {
     return (
       <div className="container mx-auto flex flex-col gap-6 px-2.5 py-10">
@@ -36,30 +39,40 @@ function TreatmentsPageContent() {
   }
 
   return (
-    <div className="container mx-auto flex flex-col gap-6 px-2.5 py-10">
-      <Header />
+    <>
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-primary focus:text-primary-foreground focus:rounded-md focus:outline-none focus:ring-2 focus:ring-ring"
+      >
+        {t("aria-skip-to-main")}
+      </a>
+      <div className="container mx-auto flex flex-col gap-6 px-2.5 py-10">
+        <Header />
 
-      <FiltersSection
-        search={filters.search}
-        onSearchChange={setSearch}
-        status={filters.status}
-        onStatusChange={setStatus}
-        onAddTreatment={handleAddTreatment}
-      />
+        <main id="main-content" tabIndex={-1}>
+          <FiltersSection
+            search={filters.search}
+            onSearchChange={setSearch}
+            status={filters.status}
+            onStatusChange={setStatus}
+            onAddTreatment={handleAddTreatment}
+          />
 
-      <TreatmentsContent
-        filteredTreatments={filteredItems}
-        paginatedTreatments={paginatedItems}
-        isLoading={isLoading}
-        total={pagination.total}
-        currentPage={pagination.page}
-        totalPages={pagination.totalPages}
-        onPageChange={setCurrentPage}
-        sortConfig={sort}
-        onSort={handleSort}
-        onUpdateStatus={updateTreatmentStatus}
-      />
-    </div>
+          <TreatmentsContent
+            filteredTreatments={filteredItems}
+            paginatedTreatments={paginatedItems}
+            isLoading={isLoading}
+            total={pagination.total}
+            currentPage={pagination.page}
+            totalPages={pagination.totalPages}
+            onPageChange={setCurrentPage}
+            sortConfig={sort}
+            onSort={handleSort}
+            onUpdateStatus={updateTreatmentStatus}
+          />
+        </main>
+      </div>
+    </>
   );
 }
 

@@ -44,5 +44,17 @@
   "validation-patient-required": "Le patient est requis",
   "validation-procedure-required": "La procédure est requise",
   "validation-dentist-required": "Le dentiste est requis",
-  "validation-date-required": "La date est requise"
+  "validation-date-required": "La date est requise",
+  "aria-search-label": "Rechercher des traitements",
+  "aria-search-description": "Rechercher par nom de patient, procédure ou dentiste",
+  "aria-status-filter-label": "Filtrer les traitements par statut",
+  "aria-status-selected": "Statut sélectionné: {status}",
+  "aria-status-count": "{count} statuts sélectionnés",
+  "aria-treatment-card": "Traitement pour {patient}",
+  "aria-update-status-label": "Mettre à jour le statut pour {patient}",
+  "aria-status-current": "Statut actuel: {status}",
+  "aria-loading-treatments": "Chargement des traitements",
+  "aria-treatments-loaded": "{count} traitements chargés",
+  "aria-pagination": "Pagination, page {current} sur {total}",
+  "aria-skip-to-main": "Aller au contenu principal"
 }

@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -17,6 +18,7 @@ interface StatusFilterProps {
 
 export function StatusFilter({ value, onChange }: StatusFilterProps) {
   const t = useTranslations();
+  const [isOpen, setIsOpen] = useState<boolean>(false);
 
   const STATUS_OPTIONS: { label: string; value: TreatmentStatus }[] = [
     { label: t("status-scheduled"), value: "scheduled" },
@@ -57,17 +59,39 @@ export function StatusFilter({ value, onChange }: StatusFilterProps) {
     onChange("all");
   };
 
+  const selectedOption = selectedStatuses.length === 1
+    ? STATUS_OPTIONS.find((opt) => opt.value === selectedStatuses[0])
+    : null;
+
+  const ariaLabel = isAllSelected
+    ? t("aria-status-filter-label")
+    : selectedStatuses.length === 1 && selectedOption
+      ? t("aria-status-selected", {
+          status: selectedOption.label,
+        })
+      : t("aria-status-count", { count: selectedStatuses.length });
+
   return (
-    <DropdownMenu>
+    <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline" className="md:w-[220px] justify-start">
+        <Button
+          variant="outline"
+          className="md:w-[220px] justify-start"
+          aria-label={ariaLabel}
+          aria-haspopup="true"
+          aria-expanded={isOpen}
+        >
           {getDisplayText()}
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-56">
+      <DropdownMenuContent className="w-56" role="menu" aria-label={t("filter-by-status")}>
         <DropdownMenuLabel>{t("filter-by-status")}</DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuCheckboxItem checked={isAllSelected} onCheckedChange={handleSelectAll}>
+        <DropdownMenuCheckboxItem
+          checked={isAllSelected}
+          onCheckedChange={handleSelectAll}
+          role="menuitemcheckbox"
+        >
           {t("status-all")}
         </DropdownMenuCheckboxItem>
         <DropdownMenuSeparator />
@@ -76,6 +100,7 @@ export function StatusFilter({ value, onChange }: StatusFilterProps) {
             key={option.value}
             checked={selectedStatuses.includes(option.value)}
             onCheckedChange={() => handleStatusToggle(option.value)}
+            role="menuitemcheckbox"
           >
             {option.label}
           </DropdownMenuCheckboxItem>

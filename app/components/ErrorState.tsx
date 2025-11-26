@@ -16,14 +16,22 @@ export function ErrorState({
   return (
     <div
       className={`flex flex-col items-center justify-center rounded-md border border-destructive/20 bg-destructive/5 p-8 text-center ${className}`}
+      role="alert"
+      aria-live="assertive"
+      aria-label={title}
     >
       <div className="mx-auto flex max-w-[420px] flex-col items-center justify-center text-center">
-        <AlertCircle className="mb-4 h-10 w-10 text-destructive" />
+        <AlertCircle className="mb-4 h-10 w-10 text-destructive" aria-hidden="true" />
         <h3 className="mb-2 text-lg font-semibold">{title}</h3>
         <p className="mb-6 text-sm text-muted-foreground">{description}</p>
         {onRetry && (
-          <Button variant="outline" onClick={onRetry} className="gap-2">
-            <RefreshCw className="h-4 w-4" />
+          <Button
+            variant="outline"
+            onClick={onRetry}
+            className="gap-2"
+            aria-label={t("try-again")}
+          >
+            <RefreshCw className="h-4 w-4" aria-hidden="true" />
             {t("try-again")}
           </Button>
         )}
